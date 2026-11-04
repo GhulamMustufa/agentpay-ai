@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "AgentPay - PayPal AI API Test Suite",
+    "_postman_id": "c71a39df-1558-45e0-9428-paypal-ai-2026",
+    "description": "Comprehensive Postman test collection for AgentPay's PayPal Orders v2 integration, token issuance, and agentic settlement workflows.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. PayPal OAuth2 Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Accept-Language", "value": "en_US" }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "grant_type", "value": "client_credentials", "type": "text" }
+          ]
+        },
+        "url": {
+          "raw": "https://api-m.sandbox.paypal.com/v1/oauth2/token",
+          "protocol": "https",
+          "host": ["api-m", "sandbox", "paypal", "com"],
+          "path": ["v1", "oauth2", "token"]
+        }
+      }
+    },
+    {
+      "name": "2. Create Order v2 (Agentic Intent)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"intent\": \"CAPTURE\",\n  \"purchase_units\": [\n    {\n      \"reference_id\": \"AGENTPAY-ORDER-991\",\n      \"amount\": {\n        \"currency_code\": \"USD\",\n        \"value\": \"849.00\"\n      },\n      \"description\": \"AgentPay Autonomous Purchase: Dell XPS 13 Developer Edition\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "https://api-m.sandbox.paypal.com/v2/checkout/orders",
+          "protocol": "https",
+          "host": ["api-m", "sandbox", "paypal", "com"],
+          "path": ["v2", "checkout", "orders"]
+        }
+      }
+    },
+    {
+      "name": "3. Capture Order v2",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "https://api-m.sandbox.paypal.com/v2/checkout/orders/{{order_id}}/capture",
+          "protocol": "https",
+          "host": ["api-m", "sandbox", "paypal", "com"],
+          "path": ["v2", "checkout", "orders", "{{order_id}}", "capture"]
+        }
+      }
+    }
+  ]
+}
