@@ -16,18 +16,9 @@ export async function POST(req: NextRequest) {
 
     const apiKey = geminiApiKey || process.env.GEMINI_API_KEY;
 
-    // If an API key is available, call Google Gemini 1.5 Flash
+    // If an API key is available, call Google Gemini 3.5 Flash REST API
     if (apiKey && apiKey !== "your_gemini_api_key_here") {
       try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-          model: "gemini-1.5-flash",
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.2,
-          },
-        });
-
         const promptTemplate = `
 You are the AI procurement engine for AgentPay.
 The user wants to buy: "${prompt}".
@@ -97,15 +88,32 @@ Return STRICT JSON matching this exact structure:
 }
 `;
 
-        const result = await model.generateContent(promptTemplate);
-        const text = result.response.text();
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+        const geminiRes = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptTemplate }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.2,
+            },
+          }),
+        });
+
+        const geminiData = await geminiRes.json();
+        if (!geminiRes.ok) {
+          throw new Error(geminiData.error?.message || "Gemini REST error");
+        }
+
+        const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
         const parsed = JSON.parse(text) as ShoppingAnalysisResult;
 
         return NextResponse.json({
           success: true,
           isLiveLLM: true,
-          model: "gemini-1.5-flash",
-          provider: "Google Gemini AI",
+          model: "gemini-3.5-flash",
+          provider: "Google Gemini AI (Live)",
           analysis: parsed,
         });
       } catch (llmErr: any) {
