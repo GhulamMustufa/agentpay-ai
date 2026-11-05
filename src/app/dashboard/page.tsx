@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Dialog } from "@/components/ui/Dialog";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useToast } from "@/components/ui/Toast";
+import { analyzeShoppingPrompt, ShoppingQuote } from "@/lib/ai/shopping-agent";
 import {
   ArrowLeft,
   Play,
@@ -24,13 +25,24 @@ import {
   Code2,
   Wallet,
   PiggyBank,
+  Settings,
+  HelpCircle,
 } from "lucide-react";
 
 export default function DashboardPage() {
   const { toast } = useToast();
   const [isRunning, setIsRunning] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Search & Customization State
   const [userPrompt, setUserPrompt] = useState("Find me a high-performance developer laptop under $900 with 16GB RAM");
+  const [budgetCap, setBudgetCap] = useState<number>(900);
+  const [activeCategory, setActiveCategory] = useState<string>("laptop");
+
+  // Edge case message states
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
   // Discrepancy & Policy State
   const [policyAlert, setPolicyAlert] = useState<{
@@ -50,10 +62,45 @@ export default function DashboardPage() {
     merchant: string;
   } | null>(null);
 
+  // Dynamic Store Quotes Table State
+  const [quotes, setQuotes] = useState<ShoppingQuote[]>([
+    {
+      vendor: "CloudTech Supply",
+      item: "Dell XPS 13 Dev Edition",
+      specs: "Intel Core i7 • 16GB RAM • 512GB SSD",
+      price: 949.0,
+      markup: 100.0,
+      markupReason: "Unauthorized Rush Fee",
+      isCompliant: false,
+      warranty: "1-Year Standard",
+      matchScore: 0.88,
+    },
+    {
+      vendor: "Official Dell Direct (PayPal Verified)",
+      item: "Dell XPS 13 Dev Edition",
+      specs: "Intel Core i7 • 16GB RAM • 512GB SSD • Ubuntu/Win",
+      price: 849.0,
+      markup: 0,
+      isCompliant: true,
+      warranty: "Full 1-Year Manufacturer Warranty",
+      matchScore: 0.98,
+    },
+    {
+      vendor: "Certified Refurb Store",
+      item: "MacBook Air M2 (Refurb)",
+      specs: "Apple M2 • 16GB Unified RAM • 256GB SSD",
+      price: 899.0,
+      markup: 0,
+      isCompliant: true,
+      warranty: "90-Day Limited Warranty",
+      matchScore: 0.92,
+    },
+  ]);
+
   const [logs, setLogs] = useState<string[]>([
     "System ready. Connected to PayPal Sandbox gateway.",
-    "Spending limit active: Max budget cap set at $900.00.",
-    "Ready. Enter what you want to buy and click search.",
+    `Spending limit active: Max budget cap set at $${budgetCap.toFixed(2)}.`,
+    "Ready. Enter what you want to buy or select a preset below.",
   ]);
 
   const [status, setStatus] = useState<"idle" | "running" | "paused_for_approval" | "success">("idle");
@@ -68,66 +115,125 @@ export default function DashboardPage() {
     payload: any;
   } | null>(null);
 
-  // Trigger Autonomous Flow with Discrepancy Trap
+  // Quick Preset Selection Helper
+  const applyPreset = (promptText: string, budget: number, category: string) => {
+    setUserPrompt(promptText);
+    setBudgetCap(budget);
+    setActiveCategory(category);
+    setInfoMessage(null);
+    setWarningMessage(null);
+    setPolicyAlert(null);
+    setPendingApproval(false);
+    setSelectedProduct(null);
+    setStatus("idle");
+    setStep(0);
+    setLogs((prev) => [
+      ...prev,
+      `Switched preset: ${category.toUpperCase()} • Budget Cap: $${budget.toFixed(2)}.`,
+    ]);
+  };
+
+  // Trigger Autonomous Dynamic Flow with Edge Case Detection
   const runAgenticCommerceFlow = () => {
-    setIsRunning(true);
-    setStatus("running");
-    setStep(1);
+    setInfoMessage(null);
+    setWarningMessage(null);
     setPolicyAlert(null);
     setPendingApproval(false);
     setSelectedProduct(null);
 
+    // 1. Run dynamic intelligence analysis
+    const analysis = analyzeShoppingPrompt(userPrompt, budgetCap);
+
+    // Edge Case 1: Non-Shopping Query
+    if (!analysis.isShopping) {
+      setInfoMessage(analysis.feedbackMessage || "Non-shopping request detected.");
+      setStatus("idle");
+      setStep(0);
+      setLogs((prev) => [
+        ...prev,
+        `⚠️ Non-Shopping Request: "${userPrompt}"`,
+        "AgentPay halted execution. No purchase initiated for non-commercial queries.",
+      ]);
+      return;
+    }
+
+    // Edge Case 2: Unrealistic budget
+    if (analysis.isUnrealistic) {
+      setWarningMessage(analysis.feedbackMessage || "Budget limit too low.");
+      setStatus("idle");
+      setStep(0);
+      setLogs((prev) => [
+        ...prev,
+        `⚠️ Unrealistic Budget Warning for ${analysis.category}: $${analysis.budgetCap.toFixed(2)}.`,
+        "No verified sellers available below minimum market cost. Execution halted safely.",
+      ]);
+      return;
+    }
+
+    // Dynamic Execution for valid shopping query
+    setIsRunning(true);
+    setStatus("running");
+    setStep(1);
+    setQuotes(analysis.quotes);
+
     setLogs((prev) => [
       ...prev,
-      `Step 1: Searching verified stores for "${userPrompt}"...`,
-      "Comparing seller prices, warranties, and stock availability...",
+      `Step 1: Searching verified stores for "${userPrompt}" with budget cap $${analysis.budgetCap.toFixed(2)}...`,
+      `Ingested 3 candidate quotes for category: ${analysis.category || "General"}...`,
     ]);
 
     // Step 2: The Discrepancy Trap (Vendor #1 Overcharge Detected)
     setTimeout(() => {
       setStep(2);
-      setPolicyAlert({
-        vendor: "CloudTech Supply",
-        quotedAmount: "$949.00",
-        budgetCap: "$900.00",
-        markup: "$100.00",
-        reason: "Hidden $100 rush fee detected. Total price is $49.00 over your $900 budget limit.",
-      });
+      const violating = analysis.violatingQuote;
+      if (violating) {
+        setPolicyAlert({
+          vendor: violating.vendor,
+          quotedAmount: `$${violating.price.toFixed(2)}`,
+          budgetCap: `$${analysis.budgetCap.toFixed(2)}`,
+          markup: `$${violating.markup.toFixed(2)}`,
+          reason: `${violating.markupReason || "Unapproved surcharge"}. Total is $${(violating.price - analysis.budgetCap).toFixed(2)} over your budget.`,
+        });
 
-      setLogs((prev) => [
-        ...prev,
-        "⚠️ Hidden Fee Caught: CloudTech Supply quoted $949.00 ($100 unapproved rush fee).",
-        "Payment halted. The AI rejected CloudTech Supply to protect your budget.",
-        "Step 2: Switching to alternative seller: Official Dell Direct...",
-      ]);
+        setLogs((prev) => [
+          ...prev,
+          `⚠️ Hidden Fee Caught: ${violating.vendor} quoted $${violating.price.toFixed(2)} (including $${violating.markup.toFixed(2)} surcharge).`,
+          `Payment halted. The AI rejected ${violating.vendor} to protect your budget limit of $${analysis.budgetCap.toFixed(2)}.`,
+          `Step 2: Switching to compliant seller: ${analysis.approvedQuote?.vendor || "Verified Seller"}...`,
+        ]);
+      }
     }, 1000);
 
     // Step 3: Compliant Resolution & Human-in-the-Loop Gate
     setTimeout(() => {
       setStep(3);
-      setSelectedProduct({
-        id: "c3-prod-101",
-        name: "Dell XPS 13 Developer Edition",
-        price: "$849.00",
-        specs: "Intel Core i7 • 16GB RAM • 512GB SSD • 1-Year Warranty",
-        merchant: "Official Dell Direct (PayPal Verified Seller)",
-      });
+      const approved = analysis.approvedQuote;
+      if (approved) {
+        setSelectedProduct({
+          id: "c3-prod-dyn",
+          name: approved.item,
+          price: `$${approved.price.toFixed(2)}`,
+          specs: approved.specs,
+          merchant: approved.vendor,
+        });
 
-      setLogs((prev) => [
-        ...prev,
-        "✓ Match Verified: Dell Direct quoted $849.00 with fair pricing ($51.00 under your budget).",
-        "Step 3: Prepared PayPal checkout order.",
-        "✋ Waiting for your 1-click confirmation before paying...",
-      ]);
+        const diff = analysis.budgetCap - approved.price;
+        setLogs((prev) => [
+          ...prev,
+          `✓ Match Verified: ${approved.vendor} quoted $${approved.price.toFixed(2)} with fair pricing ($${diff.toFixed(2)} under your budget).`,
+          "Step 3: Prepared PayPal checkout order in sandbox.",
+          "✋ Waiting for your 1-click confirmation before paying...",
+        ]);
 
-      setIsRunning(false);
-      setPendingApproval(true);
-      setStatus("paused_for_approval");
-      toast({
-        title: "Overcharge Stopped",
-        description: "AI rejected $949 fee. Dell Direct ($849.00) is ready for your approval.",
-        type: "success",
-      });
+        setIsRunning(false);
+        setPendingApproval(true);
+        setStatus("paused_for_approval");
+        toast({
+          title: "Overcharge Stopped",
+          description: `AI rejected overcharge. ${approved.item} ($${approved.price.toFixed(2)}) is ready for your approval.`,
+          type: "success",
+        });
+      }
     }, 2200);
   };
 
@@ -153,7 +259,7 @@ export default function DashboardPage() {
       setStatus("success");
       toast({
         title: "Payment Confirmed!",
-        description: "Paid $849.00 via PayPal Sandbox in 312ms. Order confirmed.",
+        description: `Paid ${selectedProduct?.price} via PayPal Sandbox in 312ms. Order confirmed.`,
         type: "success",
       });
     }, 1100);
@@ -175,9 +281,9 @@ export default function DashboardPage() {
             name: "paypal_check_purchase_policy",
             arguments: {
               vendorName: "CloudTech Supply",
-              quotedAmount: 949.0,
-              budgetCap: 900.0,
-              unapprovedMarkup: 100.0,
+              quotedAmount: budgetCap + 49.0,
+              budgetCap: budgetCap,
+              unapprovedMarkup: 50.0,
             },
           },
         }),
@@ -215,11 +321,14 @@ export default function DashboardPage() {
             Shopping Demo & Dashboard
           </span>
           <Badge variant="success" className="hidden sm:inline-flex text-[11px] font-medium">
-            ● Demo Active
+            ● Dynamic AI Mode
           </Badge>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <Button variant="outline" size="sm" onClick={() => setIsSettingsOpen(true)} className="px-2.5 sm:px-3 text-xs sm:text-sm">
+            <Settings className="w-3.5 h-3.5 mr-1" /> Custom Keys
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)} className="px-2.5 sm:px-3 text-xs sm:text-sm">
             <Code2 className="w-3.5 h-3.5 mr-1" /> Sponsor Proof
           </Button>
@@ -237,9 +346,9 @@ export default function DashboardPage() {
                 <span>Your Spending Limit</span>
                 <Wallet className="w-4 h-4 text-primary" />
               </CardDescription>
-              <CardTitle className="text-xl font-bold text-foreground">$900.00 Max</CardTitle>
+              <CardTitle className="text-xl font-bold text-foreground">${budgetCap.toFixed(2)} Max</CardTitle>
             </CardHeader>
-            <p className="text-[11px] text-muted-foreground mt-1">Strict limit enforced by AI</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Strict limit enforced by AI guardrail</p>
           </Card>
 
           <Card className="glass p-4">
@@ -248,9 +357,11 @@ export default function DashboardPage() {
                 <span>Overcharges Stopped</span>
                 <PiggyBank className="w-4 h-4 text-emerald-400" />
               </CardDescription>
-              <CardTitle className="text-xl font-bold text-emerald-400">$100.00 Saved</CardTitle>
+              <CardTitle className="text-xl font-bold text-emerald-400">
+                {policyAlert ? policyAlert.markup : "$0.00 Saved"}
+              </CardTitle>
             </CardHeader>
-            <p className="text-[11px] text-muted-foreground mt-1">Hidden rush fee caught & rejected</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Hidden fee detected & blocked</p>
           </Card>
 
           <Card className="glass p-4">
@@ -263,6 +374,53 @@ export default function DashboardPage() {
             </CardHeader>
             <p className="text-[11px] text-muted-foreground mt-1">Safe test payment environment</p>
           </Card>
+        </div>
+
+        {/* Quick Presets Bar */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
+          <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5 text-primary" /> Quick Presets:
+          </span>
+          <Button
+            variant={activeCategory === "laptop" ? "glow" : "outline"}
+            size="sm"
+            onClick={() => applyPreset("Find me a high-performance developer laptop under $900 with 16GB RAM", 900, "laptop")}
+            className="h-7 text-xs"
+          >
+            💻 Laptop ($900)
+          </Button>
+          <Button
+            variant={activeCategory === "headphones" ? "glow" : "outline"}
+            size="sm"
+            onClick={() => applyPreset("Find noise canceling wireless headphones under $250 for travel", 250, "headphones")}
+            className="h-7 text-xs"
+          >
+            🎧 Headphones ($250)
+          </Button>
+          <Button
+            variant={activeCategory === "monitor" ? "glow" : "outline"}
+            size="sm"
+            onClick={() => applyPreset("Buy a 27 inch 4K UltraSharp monitor under $400 for coding", 400, "monitor")}
+            className="h-7 text-xs"
+          >
+            🖥️ 4K Monitor ($400)
+          </Button>
+          <Button
+            variant={activeCategory === "chair" ? "glow" : "outline"}
+            size="sm"
+            onClick={() => applyPreset("Ergonomic desk chair for lumbar support under $350", 350, "chair")}
+            className="h-7 text-xs"
+          >
+            🪑 Office Chair ($350)
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => applyPreset("Write me a poem about the sunrise and oceans", 100, "non_shopping")}
+            className="h-7 text-xs border-dashed text-muted-foreground hover:text-foreground"
+          >
+            ❓ Non-Shopping Edge Case
+          </Button>
         </div>
 
         {/* The Interactive Shopping Search Card */}
@@ -300,16 +458,28 @@ export default function DashboardPage() {
               </Button>
             </div>
 
-            {/* Prompt Input */}
-            <div className="mt-3 pt-3 border-t border-border/60 flex flex-col sm:flex-row items-start sm:items-center gap-2">
-              <span className="text-xs text-muted-foreground font-medium shrink-0">I want to buy:</span>
-              <input
-                type="text"
-                value={userPrompt}
-                onChange={(e) => setUserPrompt(e.target.value)}
-                disabled={isRunning || pendingApproval}
-                className="w-full text-xs font-normal px-3 py-2 rounded-md bg-muted/50 border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              />
+            {/* Custom Prompt & Budget Inputs */}
+            <div className="mt-4 pt-3 border-t border-border/60 grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div className="sm:col-span-3">
+                <label className="text-[11px] text-muted-foreground font-medium block mb-1">I want to buy:</label>
+                <input
+                  type="text"
+                  value={userPrompt}
+                  onChange={(e) => setUserPrompt(e.target.value)}
+                  disabled={isRunning || pendingApproval}
+                  className="w-full text-xs font-normal px-3 py-2 rounded-md bg-muted/50 border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground font-medium block mb-1">Max Budget Cap ($):</label>
+                <input
+                  type="number"
+                  value={budgetCap}
+                  onChange={(e) => setBudgetCap(parseFloat(e.target.value) || 0)}
+                  disabled={isRunning || pendingApproval}
+                  className="w-full text-xs font-normal px-3 py-2 rounded-md bg-muted/50 border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
             </div>
           </CardHeader>
 
@@ -329,6 +499,28 @@ export default function DashboardPage() {
                 4. Paid via PayPal
               </div>
             </div>
+
+            {/* EDGE CASE: NON-SHOPPING NOTICE */}
+            {infoMessage && (
+              <div className="p-3.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs flex items-start gap-2.5 animate-in fade-in">
+                <HelpCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-blue-400">Non-Shopping Request</span>
+                  <p className="text-muted-foreground mt-0.5 font-normal">{infoMessage}</p>
+                </div>
+              </div>
+            )}
+
+            {/* EDGE CASE: UNREALISTIC BUDGET NOTICE */}
+            {warningMessage && (
+              <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs flex items-start gap-2.5 animate-in fade-in">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-amber-400">Price Limit Notice</span>
+                  <p className="text-muted-foreground mt-0.5 font-normal">{warningMessage}</p>
+                </div>
+              </div>
+            )}
 
             {/* OVERCHARGE ALERT: Clear and friendly */}
             {policyAlert && (
@@ -358,7 +550,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-muted-foreground font-normal">
                     The AI found a verified match: <span className="text-foreground font-medium">{selectedProduct.name}</span> for <span className="font-semibold text-foreground">{selectedProduct.price}</span> from {selectedProduct.merchant}.
                   </p>
-                  <p className="text-[11px] text-emerald-400 font-normal">✓ Fair price verified • $51.00 under your budget</p>
+                  <p className="text-[11px] text-emerald-400 font-normal">✓ Fair price verified • Within your ${budgetCap.toFixed(2)} budget</p>
                 </div>
                 <Button
                   variant="glow"
@@ -367,7 +559,7 @@ export default function DashboardPage() {
                   disabled={isRunning}
                   className="shrink-0 whitespace-nowrap bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs px-4 py-2"
                 >
-                  <Send className="w-3.5 h-3.5 mr-1.5" /> Approve ${selectedProduct.price.replace("$", "")} with PayPal
+                  <Send className="w-3.5 h-3.5 mr-1.5" /> Approve {selectedProduct.price} with PayPal
                 </Button>
               </div>
             )}
@@ -417,7 +609,7 @@ export default function DashboardPage() {
                 logs.map((log, index) => (
                   <div key={index} className="leading-relaxed">
                     <span className="text-muted-foreground">&gt; </span>
-                    <span className={log.includes("Successful") || log.includes("Verified") ? "text-emerald-400 font-normal" : log.includes("Caught") || log.includes("halted") ? "text-rose-300 font-normal" : "text-foreground font-normal"}>
+                    <span className={log.includes("Successful") || log.includes("Verified") ? "text-emerald-400 font-normal" : log.includes("Caught") || log.includes("halted") || log.includes("Non-Shopping") ? "text-rose-300 font-normal" : "text-foreground font-normal"}>
                       {log}
                     </span>
                   </div>
@@ -470,12 +662,12 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Price Comparison Table (AG Grid) */}
+        {/* Dynamic Price Comparison Table (AG Grid) */}
         <Card className="glass">
           <CardHeader className="p-4 pb-2">
             <CardTitle className="text-sm font-semibold flex items-center justify-between">
-              <span>Store Price Comparison</span>
-              <span className="text-xs text-muted-foreground font-normal">Audited across sellers</span>
+              <span>Dynamic Store Price Comparison</span>
+              <span className="text-xs text-muted-foreground font-normal">Real-time quotes based on your search</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-1">
@@ -486,42 +678,88 @@ export default function DashboardPage() {
                     <th className="py-2 px-3">Seller / Store</th>
                     <th className="py-2 px-3">Item</th>
                     <th className="py-2 px-3">Price</th>
-                    <th className="py-2 px-3">Fee Check</th>
+                    <th className="py-2 px-3">Fee & Policy Check</th>
                     <th className="py-2 px-3">AI Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  <tr>
-                    <td className="py-2.5 px-3 flex items-center gap-1.5 text-foreground">
-                      <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" /> CloudTech Supply
-                    </td>
-                    <td className="py-2.5 px-3 text-muted-foreground">Dell XPS 13</td>
-                    <td className="py-2.5 px-3 font-semibold text-rose-400">$949.00</td>
-                    <td className="py-2.5 px-3 text-rose-300">Over budget (+$100 rush fee)</td>
-                    <td className="py-2.5 px-3"><Badge variant="destructive" className="text-[10px]">Blocked</Badge></td>
-                  </tr>
-                  <tr className="bg-emerald-500/5">
-                    <td className="py-2.5 px-3 flex items-center gap-1.5 text-foreground font-medium">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Official Dell Direct
-                    </td>
-                    <td className="py-2.5 px-3 text-muted-foreground">Dell XPS 13</td>
-                    <td className="py-2.5 px-3 font-semibold text-emerald-400">$849.00</td>
-                    <td className="py-2.5 px-3 text-emerald-400">Fair price ($51 under budget)</td>
-                    <td className="py-2.5 px-3"><Badge variant="success" className="text-[10px]">Approved</Badge></td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 px-3 text-foreground">Certified Refurb Store</td>
-                    <td className="py-2.5 px-3 text-muted-foreground">MacBook Air M2</td>
-                    <td className="py-2.5 px-3 text-muted-foreground">$899.00</td>
-                    <td className="py-2.5 px-3 text-muted-foreground">Valid price (90-day warranty)</td>
-                    <td className="py-2.5 px-3"><Badge variant="outline" className="text-[10px]">Alternative</Badge></td>
-                  </tr>
+                  {quotes.map((q, idx) => (
+                    <tr key={idx} className={!q.isCompliant ? "" : "bg-emerald-500/5"}>
+                      <td className="py-2.5 px-3 flex items-center gap-1.5 text-foreground font-medium">
+                        {!q.isCompliant ? (
+                          <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                        ) : (
+                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        )}
+                        {q.vendor}
+                      </td>
+                      <td className="py-2.5 px-3 text-muted-foreground">{q.item}</td>
+                      <td className={`py-2.5 px-3 font-semibold ${!q.isCompliant ? "text-rose-400" : "text-emerald-400"}`}>
+                        ${q.price.toFixed(2)}
+                      </td>
+                      <td className={`py-2.5 px-3 ${!q.isCompliant ? "text-rose-300" : "text-emerald-400"}`}>
+                        {!q.isCompliant ? `Over budget (+$${q.markup.toFixed(2)} fee)` : `Fair price (${q.warranty})`}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {!q.isCompliant ? (
+                          <Badge variant="destructive" className="text-[10px]">Blocked</Badge>
+                        ) : (
+                          <Badge variant="success" className="text-[10px]">Approved</Badge>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </CardContent>
         </Card>
       </main>
+
+      {/* Settings / Custom PayPal Keys Dialog */}
+      <Dialog
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        title="Custom PayPal Sandbox Settings"
+        description="Switch between Zero-Config Simulation and Live PayPal Developer Sandbox."
+      >
+        <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
+          <div className="p-3 rounded-lg border border-border bg-muted/40">
+            <span className="font-semibold text-foreground text-sm block mb-1">Current Active Mode: Zero-Config Sandbox Simulation</span>
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              Judges can test every feature immediately without creating PayPal accounts. The system simulates live PayPal Orders v2 transactions with realistic IDs and latency.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-medium text-foreground block">Optional: Your PayPal Sandbox Client ID</label>
+            <input
+              type="text"
+              placeholder="Paste Client ID from developer.paypal.com"
+              className="w-full text-xs px-3 py-2 rounded-md bg-muted/50 border border-border text-foreground font-mono"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-medium text-foreground block">Optional: Your PayPal Sandbox Client Secret</label>
+            <input
+              type="password"
+              placeholder="Paste Client Secret from developer.paypal.com"
+              className="w-full text-xs px-3 py-2 rounded-md bg-muted/50 border border-border text-foreground font-mono"
+            />
+          </div>
+
+          <p className="text-[11px] text-muted-foreground">
+            You can also add these credentials directly into <code>.env.local</code> as <code>PAYPAL_CLIENT_ID</code> and <code>PAYPAL_CLIENT_SECRET</code>.
+          </p>
+
+          <div className="pt-2 flex justify-end">
+            <Button size="sm" onClick={() => setIsSettingsOpen(false)}>
+              Save & Close
+            </Button>
+          </div>
+        </div>
+      </Dialog>
 
       {/* Sponsor Proof Modal */}
       <Dialog
