@@ -2,19 +2,62 @@ import { describe, it, expect } from "vitest";
 import { handleMCPRequest, MCP_TOOLS } from "../mcp/server";
 
 describe("PayPal Commerce MCP Server", () => {
-  it("should expose all 4 standardized commerce tools", async () => {
+  it("should expose all 5 standardized commerce tools", async () => {
     const res = await handleMCPRequest({
       jsonrpc: "2.0",
       id: 1,
       method: "tools/list",
     });
 
-    expect(res.result.tools).toHaveLength(4);
+    expect(res.result.tools).toHaveLength(5);
     const toolNames = res.result.tools.map((t: any) => t.name);
     expect(toolNames).toContain("paypal_search_catalog");
     expect(toolNames).toContain("paypal_audit_spec_parity");
+    expect(toolNames).toContain("paypal_check_purchase_policy");
     expect(toolNames).toContain("paypal_create_order");
     expect(toolNames).toContain("paypal_capture_order");
+  });
+
+  it("should detect budget violations via paypal_check_purchase_policy", async () => {
+    const res = await handleMCPRequest({
+      jsonrpc: "2.0",
+      id: "test_policy_1",
+      method: "tools/call",
+      params: {
+        name: "paypal_check_purchase_policy",
+        arguments: {
+          vendorName: "CloudTech Distro",
+          quotedAmount: 949.00,
+          budgetCap: 900.00,
+          unapprovedMarkup: 100.00,
+        },
+      },
+    });
+
+    const parsed = JSON.parse(res.result.content[0].text);
+    expect(parsed.compliant).toBe(false);
+    expect(parsed.action).toBe("HALT_PAYMENT");
+    expect(parsed.violationDetails.overageAmount).toBe(49.00);
+  });
+
+  it("should reject order creation if exceeding budget cap without override token", async () => {
+    const res = await handleMCPRequest({
+      jsonrpc: "2.0",
+      id: "test_policy_2",
+      method: "tools/call",
+      params: {
+        name: "paypal_create_order",
+        arguments: {
+          productId: "c3-prod-overpriced",
+          amount: 949.00,
+          budgetCap: 900.00,
+        },
+      },
+    });
+
+    expect(res.error).toBeDefined();
+    expect(res.error.code).toBe(-32001);
+    expect(res.error.message).toContain("PolicyViolation");
   });
 
   it("should execute paypal_search_catalog tool call via Channel3 and Elastic", async () => {

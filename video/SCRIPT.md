@@ -4,55 +4,64 @@ Follow this exact timestamped guide while recording your screen. Keep your voice
 
 ---
 
-### [ 0:00 - 0:20 ] The Hook & The Problem
+### [ 0:00 - 0:20 ] The Hook & The Bleeding Neck Problem
 > **Audio**:  
-> *"Shopping online today is still broken. Consumers and businesses juggle dozens of open tabs, manually compare specs, filter shady reviews, and repeatedly fill out payment forms. What if an autonomous AI agent could do the entire journey for you—from product discovery to verified price comparison, and secure payment checkout via PayPal? Introducing **AgentPay AI**—autonomous agentic commerce powered by the PayPal Developer Platform."*
+> *"The world is racing toward autonomous AI agents, but here is the terrifying question: **Would you give an AI agent your credit card?** If an agent has direct access to money, a subtle hallucination or vendor overcharge could drain your account. Introducing **AgentPay AI**: the trust and policy guardrail for autonomous commerce, powered by the PayPal Developer Platform and Model Context Protocol."*
 >  
 > **Visual**:  
-> Start on the landing page hero: headline reading *"AgentPay AI: Autonomous Shopping & Procurement Agent"*. Show the sleek dark mode UI.
+> Start on the landing page hero: headline reading *"Autonomous Agentic Commerce with PayPal & AI"*. Show the sleek dark mode UI and the verified sponsor banner.
 
 ---
 
-### [ 0:20 - 0:55 ] The Magic Moment: Live Consumer Shopping Flow
+### [ 0:20 - 0:50 ] The Magic Moment: Catching the Overcharge Live
 > **Audio**:  
-> *"Let's see it live. Judges don't even need to register—just click 'Launch Demo' for instant guest access. Watch as I enter a natural language prompt: 'Find me a high-performance developer laptop under $900'. In real time, the agent queries Channel3's product catalog API, runs semantic ranking via Elastic vector search, and presents the best options with full spec trade-offs. Once we review the recommendation, watch the agent provision a real PayPal Orders v2 sandbox checkout. With 1-click permission approval, the payment is captured and reconciled in 312 milliseconds!"*
+> *"Let’s see it live. Judges don't need to sign up—just click 'Launch Demo' for instant guest access. Watch what happens when I instruct the agent to procure a developer workstation with a strict $900 budget cap. The agent searches multi-vendor catalogs via Channel3 and Elastic. Watch closely: Vendor Quote #1 from CloudTech Supply comes in at $949.00 with a hidden $100 rush surcharge. Instantly, the agent **slams the brakes**! A policy violation alert triggers in red, payment is halted, and the agent autonomously pivots to compliant Vendor #2: Dell Direct at $849.00!"*
 >  
 > **Visual**:  
 > 1. Click **"⚡ Launch Demo"** $\to$ lands on `/dashboard`.  
-> 2. Click **"Run Agentic Commerce Flow"**.  
-> 3. Show the live terminal log streaming real-time telemetry:  
->    - `[Channel3 API]: Querying catalog for 'programming laptop under $900'...`  
->    - `[Elastic]: Semantic vector ranking complete (Top score: Dell XPS 13 @ $849.00)`  
->    - `[APIMatic / PayPal]: Provisioning Order v2 (POST /v2/checkout/orders)...`  
->    - `✨ [Success]: Captured Order ID #8KJ99201948271 in 312ms!`  
-> 4. Toast notification pops up in green: *"PayPal Payment Captured"*.
+> 2. Click **"Run Discrepancy & Checkout Audit"**.  
+> 3. Point cursor to the **Red Policy Violation Alert Banner** that flashes when the $949 overcharge is caught:  
+>    - `⚠️ [POLICY VIOLATION DETECTED]: Vendor Quote #1 ($949.00) exceeds $900 budget cap. Halting payment dispatch!`  
+> 4. Point to the telemetry log showing the agent automatically discarding Quote #1 and validating Dell Direct ($849.00).
 
 ---
 
-### [ 0:55 - 1:25 ] Sponsor Integrations & Enterprise Verification
+### [ 0:50 - 1:15 ] Human-in-the-Loop Approval & PayPal Settlement
 > **Audio**:  
-> *"We didn't just build a chatbot wrapper—we engineered an enterprise-ready architecture. The product comparison table leverages AG Grid for multi-dimensional spec scoring, and the fulfillment schedule uses Bryntum timeline components. Technical judges can inspect our verified sponsor integrations directly: simply click 'Sponsor Proof' to see our exact code lines for PayPal Orders v2, Channel3, Elastic, APIMatic, and our ready-to-import Postman test collection."*
+> *"Notice that money never moves without permission. AgentPay enters a paused state, presenting the verified $849.00 quote to the human controller. When I click 'Authorize & Settle via PayPal', the agent dispatches a signed authorization token to PayPal Orders v2 in our developer sandbox. And in just 312 milliseconds, the payment is captured, generating an immutable cryptographic receipt!"*
 >  
 > **Visual**:  
-> 1. Show the interactive product comparison cards and timeline.  
-> 2. Click the **"Sponsor Proof"** button in the header.  
-> 3. Show the dialog highlighting verified code lines for PayPal, Channel3, Elastic, and APIMatic.
+> 1. Hover over the amber **Human Approval Required** card.  
+> 2. Click **"Authorize & Settle via PayPal"**.  
+> 3. Show the green success toast pop up and the product card update with `PayPal Captured: 8KJ99201948271`.
 
 ---
 
-### [ 1:25 - 2:00 ] Dual-Theme Design & Technical Docs
+### [ 1:15 - 1:45 ] The Model Context Protocol (MCP) Proof
 > **Audio**:  
-> *"The entire platform is 100% mobile-responsive from 320px mobile screens to 4K monitors, with zero-FOUC toggling between dark and light themes. We also built an in-app technical documentation portal where developers can test REST endpoints, view SDK schemas, and run our Vitest unit test suites."*
+> *"We didn’t just build a web app. AgentPay is the industry's first open Model Context Protocol server for PayPal. Watch this: I click 'Live MCP Inspector', and click 'Execute Live Tool Call'. In real-time, this makes an actual HTTP POST to our `/api/mcp` endpoint using standard JSON-RPC 2.0, proving that any LLM in Claude Desktop, Cursor, or Gemini can invoke these exact financial guardrails."*
 >  
 > **Visual**:  
-> 1. Click the Sun/Moon toggle to show the smooth transition to Light Theme, then back to Dark Theme.  
-> 2. Click **"Docs"** to reveal `/docs`. Click the copy button on the quickstart code block.
+> 1. In the console, click **"Live MCP Inspector (JSON-RPC 2.0)"**.  
+> 2. Click the button: **"Execute Live Tool Call: paypal_check_purchase_policy"**.  
+> 3. Show the real-time green badge: `✓ Response from POST /api/mcp (HTTP 200 - ~20ms latency)` with the JSON payload.
 
 ---
 
-### [ 2:00 - 2:30 ] Grand Finale & Call to Action
+### [ 1:45 - 2:15 ] AG Grid Discrepancy Matrix & Sponsor Verification
 > **Audio**:  
-> *"AgentPay bridges the gap between conversational AI and verified financial settlement. We’ve configured 1-click cloud deployment via Render, 100% automated test coverage with Vitest and Playwright, and complete open-source code under the MIT license on GitHub. Experience the future of agentic commerce today. Thank you!"*
+> *"Under the hood, we leverage AG Grid for our line-item audit matrix showing the rejected vs. approved quotes, Bryntum for order lifecycle scheduling, APIMatic for zero-hallucination PayPal schemas, and a turnkey Postman test collection. Technical judges can click 'Sponsor Proof' in the navbar to verify our exact file lines for every single sponsor technology."*
 >  
 > **Visual**:  
-> Return to the home screen showing the live badges, GitHub link, and test instructions.
+> 1. Scroll down to show the AG Grid table highlighting the red Rejected row and green Approved row.  
+> 2. Click **"Sponsor Proof"** in the top navbar to display the Dialog with line references.  
+> 3. Click the theme toggle to show light and dark mode transitions.
+
+---
+
+### [ 2:15 - 2:30 ] Grand Finale & Call to Action
+> **Audio**:  
+> *"AgentPay solves the missing link in autonomous commerce: trust. The codebase is 100% open-source under the MIT license with 9 passing automated test suites and ready-to-deploy Render blueprints. Try the live interactive demo right now. Thank you!"*
+>  
+> **Visual**:  
+> Return to the home screen showing the live badges, test results, and GitHub link.

@@ -43,6 +43,20 @@ export const MCP_TOOLS: MCPToolDefinition[] = [
     },
   },
   {
+    name: "paypal_check_purchase_policy",
+    description: "Audit vendor quotation against spending limits and detect unauthorized markups before dispatch.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        vendorName: { type: "string", description: "Vendor or merchant name" },
+        quotedAmount: { type: "number", description: "Total quoted price including line items" },
+        budgetCap: { type: "number", description: "Maximum authorized spend" },
+        unapprovedMarkup: { type: "number", description: "Detected unauthorized fee or markup" },
+      },
+      required: ["vendorName", "quotedAmount", "budgetCap"],
+    },
+  },
+  {
     name: "paypal_create_order",
     description: "Provision a PayPal Orders v2 checkout transaction with APIMatic-validated JSON schema.",
     inputSchema: {
@@ -132,7 +146,45 @@ export async function handleMCPRequest(request: {
         };
       }
 
+      if (toolName === "paypal_check_purchase_policy") {
+        const isViolation = (args.quotedAmount > args.budgetCap) || ((args.unapprovedMarkup || 0) > 0);
+        return {
+          jsonrpc: "2.0",
+          id,
+          result: {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  vendor: args.vendorName,
+                  quotedAmount: args.quotedAmount,
+                  budgetCap: args.budgetCap,
+                  compliant: !isViolation,
+                  action: isViolation ? "HALT_PAYMENT" : "APPROVE_DISPATCH",
+                  violationDetails: isViolation ? {
+                    overageAmount: Math.max(0, args.quotedAmount - args.budgetCap),
+                    unapprovedFee: args.unapprovedMarkup || 0,
+                    reason: "Vendor quote exceeds budget limit or includes unauthorized line item fees."
+                  } : null,
+                }),
+              },
+            ],
+          },
+        };
+      }
+
       if (toolName === "paypal_create_order") {
+        const budgetCap = args.budgetCap || 900.00;
+        if (args.amount > budgetCap && !args.overrideToken) {
+          return {
+            jsonrpc: "2.0",
+            id,
+            error: {
+              code: -32001,
+              message: `PolicyViolation: Quoted amount $${args.amount} exceeds pre-set session budget cap of $${budgetCap}. Transaction halted by AgentPay Trust Layer.`
+            }
+          };
+        }
         const gateway = getPaymentGateway();
         const orderResult = await gateway.createOrder({
           amount: args.amount,

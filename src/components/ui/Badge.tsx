@@ -5,7 +5,7 @@ export function Badge({
   className = "",
   children,
 }: {
-  variant?: "default" | "success" | "purple" | "sponsor" | "outline";
+  variant?: "default" | "success" | "purple" | "sponsor" | "outline" | "destructive";
   className?: string;
   children: React.ReactNode;
 }) {
@@ -18,6 +18,8 @@ export function Badge({
     sponsor:
       "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30",
     outline: "bg-transparent text-foreground border-border",
+    destructive:
+      "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30",
   };
 
   return (
