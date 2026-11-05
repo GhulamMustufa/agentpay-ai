@@ -63,6 +63,86 @@
           "path": ["v2", "checkout", "orders", "{{order_id}}", "capture"]
         }
       }
+    },
+    {
+      "name": "4. AgentPay Local AI Analyze (Gemini + Rules)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Find me noise cancelling headphones under $250\",\n  \"budgetCap\": 250\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/ai/analyze",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "ai", "analyze"]
+        }
+      }
+    },
+    {
+      "name": "5. AgentPay Local Create Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 849.00,\n  \"currency\": \"USD\",\n  \"description\": \"Dell XPS 13 Developer Edition\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/paypal/create-order",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "paypal", "create-order"]
+        }
+      }
+    },
+    {
+      "name": "6. AgentPay Local Capture Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"ORDER-SAMPLE-ID\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/paypal/capture-order",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "paypal", "capture-order"]
+        }
+      }
+    },
+    {
+      "name": "7. AgentPay Safe AI MCP Gateway",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"test_1\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"paypal_check_purchase_policy\",\n    \"arguments\": {\n      \"vendorName\": \"CloudTech Supply\",\n      \"quotedAmount\": 949.00,\n      \"budgetCap\": 900.00,\n      \"unapprovedMarkup\": 100.00\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/mcp",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "mcp"]
+        }
+      }
     }
   ]
 }

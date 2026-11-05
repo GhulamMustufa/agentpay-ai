@@ -7,7 +7,7 @@ interface Toast {
   id: string;
   title: string;
   description?: string;
-  type?: "success" | "error" | "info";
+  type?: "success" | "error" | "info" | "destructive";
 }
 
 interface ToastContextType {
@@ -46,7 +46,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             className="pointer-events-auto flex items-start gap-3 rounded-xl border border-border bg-card p-4 shadow-xl backdrop-blur-md animate-in slide-in-from-bottom-3 duration-200"
           >
             {t.type === "success" && <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />}
-            {t.type === "error" && <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />}
+            {(t.type === "error" || t.type === "destructive") && <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />}
             {t.type === "info" && <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />}
 
             <div className="flex-1">

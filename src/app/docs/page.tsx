@@ -150,43 +150,56 @@ npm run dev
                 </pre>
               </div>
 
-              {/* PayPal Sandbox Setup Guide Card */}
-              <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-3">
+              {/* API Keys Setup Guide Card */}
+              <div className="p-4 sm:p-5 rounded-xl border border-border bg-card space-y-4">
                 <div className="flex items-center gap-2">
                   <Key className="w-4 h-4 text-primary" />
-                  <h3 className="font-semibold text-sm text-foreground">How to Connect Free PayPal Sandbox Keys</h3>
-                  <Badge variant="success" className="text-[10px]">Free Developer Account</Badge>
+                  <h3 className="font-semibold text-sm text-foreground">Live API Keys (Google Gemini & PayPal Sandbox)</h3>
+                  <Badge variant="success" className="text-[10px]">100% Free Accounts</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed font-normal">
-                  The app runs out-of-the-box in simulated sandbox mode. If you want to make live API calls to PayPal servers:
+                  AgentPay runs out-of-the-box in Zero-Config mode so judges can evaluate everything immediately. If you want to connect live AI and PayPal network calls:
                 </p>
 
-                <ol className="list-decimal list-inside space-y-1.5 text-xs text-muted-foreground pl-1 font-normal">
-                  <li>Go to <a href="https://developer.paypal.com" target="_blank" rel="noreferrer" className="text-primary underline">developer.paypal.com</a> and sign in with any PayPal account.</li>
-                  <li>Click <strong>Dashboard</strong> &rarr; <strong>Apps & Credentials</strong> &rarr; Make sure <strong>Sandbox</strong> toggle is active.</li>
-                  <li>Click <strong>Create App</strong> (App Name: <em>AgentPay</em> &rarr; App Type: <em>Merchant</em>).</li>
-                  <li>Copy your <strong>Client ID</strong> and <strong>Secret</strong>.</li>
-                  <li>Create a <code>.env.local</code> file in the project root:</li>
-                </ol>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div className="p-3 rounded-lg border border-border/80 bg-muted/30 space-y-2">
+                    <span className="font-semibold text-foreground text-xs block">1. Google Gemini AI (Free)</span>
+                    <ol className="list-decimal list-inside space-y-1 text-[11px] text-muted-foreground">
+                      <li>Visit <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary underline">Google AI Studio</a>.</li>
+                      <li>Click <strong>&quot;Create API Key&quot;</strong> (free, no credit card required).</li>
+                      <li>Provides 15 RPM for live neural shopping reasoning.</li>
+                    </ol>
+                  </div>
+
+                  <div className="p-3 rounded-lg border border-border/80 bg-muted/30 space-y-2">
+                    <span className="font-semibold text-foreground text-xs block">2. PayPal Sandbox (Free)</span>
+                    <ol className="list-decimal list-inside space-y-1 text-[11px] text-muted-foreground">
+                      <li>Visit <a href="https://developer.paypal.com" target="_blank" rel="noreferrer" className="text-primary underline">developer.paypal.com</a>.</li>
+                      <li>Click <strong>Dashboard &rarr; Apps &amp; Credentials</strong>.</li>
+                      <li>Copy your Sandbox <strong>Client ID</strong> &amp; <strong>Secret</strong>.</li>
+                    </ol>
+                  </div>
+                </div>
 
                 <div className="rounded-lg border border-border/70 bg-muted/50 p-3 font-mono text-[11px] text-foreground">
-                  <div>PAYPAL_MODE=sandbox</div>
+                  <div># Optional: In project root .env.local</div>
+                  <div>GEMINI_API_KEY=your_gemini_key_here</div>
                   <div>PAYPAL_CLIENT_ID=your_sandbox_client_id_here</div>
                   <div>PAYPAL_CLIENT_SECRET=your_sandbox_client_secret_here</div>
                 </div>
 
                 <p className="text-[11px] text-muted-foreground">
-                  💡 You can also paste these keys directly inside the Dashboard by clicking <strong>&quot;Custom Keys&quot;</strong> in the top navigation bar.
+                  💡 <strong>No file editing required:</strong> You can also paste these keys directly inside the Dashboard by clicking <strong>&quot;Custom Keys&quot;</strong> in the top navigation bar!
                 </p>
               </div>
 
               {/* Running Tests Card */}
               <div className="p-4 rounded-xl border border-border bg-muted/40 space-y-2">
                 <h4 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Automated Tests (14/14 Passing)
+                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Automated Tests (18/18 Passing)
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed font-normal">
-                  Run <code>npm test</code> to execute all 14 automated unit tests covering payment safety, overcharge detection, non-shopping queries, and Model Context Protocol (MCP) tool execution.
+                  Run <code>npm test</code> to execute all 18 automated unit and route integration tests covering payment safety, overcharge detection, live API routes, non-shopping queries, and Model Context Protocol (MCP) tool execution.
                 </p>
               </div>
             </div>

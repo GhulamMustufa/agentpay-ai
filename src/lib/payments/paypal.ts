@@ -3,11 +3,22 @@ import { PaymentGateway, PaymentOrderRequest, PaymentOrderResponse } from "./typ
 export class PayPalPaymentGateway implements PaymentGateway {
   name = "PayPal Developer Platform (Sandbox & Live)";
 
-  private clientId = process.env.PAYPAL_CLIENT_ID;
-  private clientSecret = process.env.PAYPAL_CLIENT_SECRET;
-  private baseUrl = process.env.PAYPAL_ENVIRONMENT === "live"
-    ? "https://api-m.paypal.com"
-    : "https://api-m.sandbox.paypal.com";
+  private clientId: string | undefined;
+  private clientSecret: string | undefined;
+  private baseUrl: string;
+
+  constructor(creds?: { clientId?: string; clientSecret?: string; environment?: "sandbox" | "live" }) {
+    this.clientId = creds?.clientId || process.env.PAYPAL_CLIENT_ID;
+    this.clientSecret = creds?.clientSecret || process.env.PAYPAL_CLIENT_SECRET;
+    const env = creds?.environment || process.env.PAYPAL_ENVIRONMENT || "sandbox";
+    this.baseUrl = env === "live"
+      ? "https://api-m.paypal.com"
+      : "https://api-m.sandbox.paypal.com";
+  }
+
+  isLiveConfigured(): boolean {
+    return Boolean(this.clientId && this.clientSecret);
+  }
 
   private async getAccessToken(): Promise<string> {
     if (!this.clientId || !this.clientSecret) {

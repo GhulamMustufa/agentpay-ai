@@ -5,12 +5,13 @@ export function Badge({
   className = "",
   children,
 }: {
-  variant?: "default" | "success" | "purple" | "sponsor" | "outline" | "destructive";
+  variant?: "default" | "secondary" | "success" | "purple" | "sponsor" | "outline" | "destructive";
   className?: string;
   children: React.ReactNode;
 }) {
   const variants = {
     default: "bg-secondary text-secondary-foreground border-border",
+    secondary: "bg-muted text-muted-foreground border-border",
     success:
       "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
     purple:
