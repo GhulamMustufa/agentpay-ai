@@ -47,6 +47,7 @@ export default function DashboardPage() {
   ]);
   const [status, setStatus] = useState<"idle" | "running" | "success">("idle");
   const [step, setStep] = useState<number>(0);
+  const [activeConsoleTab, setActiveConsoleTab] = useState<"telemetry" | "mcp">("telemetry");
 
   const runAgenticCommerceFlow = () => {
     setIsRunning(true);
@@ -260,24 +261,73 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Terminal Log Console */}
-            <div className="bg-muted/70 border border-border rounded-lg p-4 font-mono text-xs text-foreground space-y-1.5 shadow-inner min-h-[140px]">
+            {/* Terminal Log & MCP Inspector Console */}
+            <div className="bg-muted/70 border border-border rounded-lg p-4 font-mono text-xs text-foreground space-y-1.5 shadow-inner min-h-[160px]">
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/80 text-muted-foreground">
-                <span className="flex items-center gap-1.5 font-sans font-semibold">
-                  <Terminal className="w-3.5 h-3.5 text-primary" /> Real-Time Telemetry & Agent Execution Log
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveConsoleTab("telemetry")}
+                    className={`flex items-center gap-1.5 font-sans font-semibold text-xs px-2.5 py-1 rounded transition-colors ${activeConsoleTab === "telemetry" ? "bg-card text-foreground border border-border" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <Terminal className="w-3.5 h-3.5 text-primary" /> Live Telemetry
+                  </button>
+                  <button
+                    onClick={() => setActiveConsoleTab("mcp")}
+                    className={`flex items-center gap-1.5 font-sans font-semibold text-xs px-2.5 py-1 rounded transition-colors ${activeConsoleTab === "mcp" ? "bg-card text-foreground border border-border" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" /> MCP Inspector (JSON-RPC 2.0)
+                  </button>
+                </div>
                 <span className="text-[10px] text-emerald-500 font-semibold uppercase">
                   STATUS: {status}
                 </span>
               </div>
-              {logs.map((log, index) => (
-                <div key={index} className="leading-relaxed">
-                  <span className="text-muted-foreground">&gt; </span>
-                  <span className={log.includes("Success") ? "text-emerald-500 font-semibold" : ""}>
-                    {log}
-                  </span>
+
+              {activeConsoleTab === "telemetry" ? (
+                logs.map((log, index) => (
+                  <div key={index} className="leading-relaxed">
+                    <span className="text-muted-foreground">&gt; </span>
+                    <span className={log.includes("Success") ? "text-emerald-500 font-semibold" : ""}>
+                      {log}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="space-y-2 text-[11px] font-mono leading-relaxed text-muted-foreground">
+                  <div className="text-primary font-semibold">// Model Context Protocol (MCP) Request: POST /api/mcp</div>
+                  <pre className="p-2.5 rounded bg-card/80 border border-border overflow-x-auto text-foreground">
+{JSON.stringify({
+  jsonrpc: "2.0",
+  id: "req_mcp_091",
+  method: "tools/call",
+  params: {
+    name: "paypal_create_order",
+    arguments: {
+      productId: "c3-prod-101",
+      amount: 849.00,
+      currency: "USD",
+      intent: "CAPTURE",
+      spendingCapAuthorized: true
+    }
+  }
+}, null, 2)}
+                  </pre>
+                  <div className="text-emerald-500 font-semibold">// MCP Response (PayPal Orders v2 Capture):</div>
+                  <pre className="p-2.5 rounded bg-card/80 border border-border overflow-x-auto text-emerald-400">
+{JSON.stringify({
+  jsonrpc: "2.0",
+  id: "req_mcp_091",
+  result: {
+    orderId: "8KJ99201948271",
+    status: "COMPLETED",
+    receiptId: "RCP-M2098K4",
+    schemaContext: "APIMatic JSON Schema v2020-12 verified",
+    executionLatencyMs: 312
+  }
+}, null, 2)}
+                  </pre>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
