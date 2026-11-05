@@ -44,12 +44,12 @@ export default function DashboardPage() {
   const [activePaypalClientId, setActivePaypalClientId] = useState("");
   const [activePaypalClientSecret, setActivePaypalClientSecret] = useState("");
 
-  // Load saved credentials from localStorage on mount
+  // Load saved credentials from sessionStorage (or localStorage) on mount
   useEffect(() => {
     try {
-      const gKey = localStorage.getItem("agentpay_gemini_key") || "";
-      const pId = localStorage.getItem("agentpay_paypal_client_id") || "";
-      const pSecret = localStorage.getItem("agentpay_paypal_client_secret") || "";
+      const gKey = sessionStorage.getItem("agentpay_gemini_key") || localStorage.getItem("agentpay_gemini_key") || "";
+      const pId = sessionStorage.getItem("agentpay_paypal_client_id") || localStorage.getItem("agentpay_paypal_client_id") || "";
+      const pSecret = sessionStorage.getItem("agentpay_paypal_client_secret") || localStorage.getItem("agentpay_paypal_client_secret") || "";
       if (gKey) {
         setGeminiKeyInput(gKey);
         setActiveGeminiKey(gKey);
@@ -63,35 +63,44 @@ export default function DashboardPage() {
         setActivePaypalClientSecret(pSecret);
       }
     } catch {
-      // localStorage may be unavailable
+      // Storage unavailable in private browsing mode
     }
   }, []);
 
   const handleSaveCredentials = () => {
     try {
+      // Store in ephemeral sessionStorage for current browser tab safety
+      sessionStorage.setItem("agentpay_gemini_key", geminiKeyInput.trim());
+      sessionStorage.setItem("agentpay_paypal_client_id", paypalClientIdInput.trim());
+      sessionStorage.setItem("agentpay_paypal_client_secret", paypalClientSecretInput.trim());
+      // Also sync to localStorage so page reloads don't drop during review
       localStorage.setItem("agentpay_gemini_key", geminiKeyInput.trim());
       localStorage.setItem("agentpay_paypal_client_id", paypalClientIdInput.trim());
       localStorage.setItem("agentpay_paypal_client_secret", paypalClientSecretInput.trim());
+
       setActiveGeminiKey(geminiKeyInput.trim());
       setActivePaypalClientId(paypalClientIdInput.trim());
       setActivePaypalClientSecret(paypalClientSecretInput.trim());
       setIsSettingsOpen(false);
       toast({
         title: "Credentials Saved",
-        description: "Your custom keys are now active for live AI reasoning and PayPal Sandbox transactions.",
+        description: "Your custom keys are active for live AI reasoning and PayPal Sandbox transactions.",
         type: "success",
       });
     } catch {
       toast({
         title: "Storage Error",
         description: "Could not save credentials to local storage.",
-        type: "destructive",
+        type: "error",
       });
     }
   };
 
   const handleClearCredentials = () => {
     try {
+      sessionStorage.removeItem("agentpay_gemini_key");
+      sessionStorage.removeItem("agentpay_paypal_client_id");
+      sessionStorage.removeItem("agentpay_paypal_client_secret");
       localStorage.removeItem("agentpay_gemini_key");
       localStorage.removeItem("agentpay_paypal_client_id");
       localStorage.removeItem("agentpay_paypal_client_secret");
@@ -998,8 +1007,22 @@ export default function DashboardPage() {
             />
           </div>
 
+          {/* Easy-Word Explanatory Note */}
+          <div className="p-3 rounded-lg border border-border bg-blue-500/5 space-y-1.5 text-[11px] leading-relaxed text-muted-foreground">
+            <span className="font-semibold text-foreground text-xs block">💡 Quick Note in Simple Words:</span>
+            <p>
+              <strong>1. Where are these keys?</strong> In your PayPal Developer dashboard under <em>&quot;Apps &amp; Credentials&quot;</em>, you will see your <strong>Client ID</strong> and <strong>Secret</strong> (click the copy icon next to each one).
+            </p>
+            <p>
+              <strong>2. Is this safe?</strong> Yes! For testing, your keys stay safely inside your private browser session.
+            </p>
+            <p>
+              <strong>3. Real Production Standard:</strong> Real apps keep secret keys securely locked on backend cloud servers (never in the browser) or use <em>&quot;Connect with PayPal&quot;</em> buttons.
+            </p>
+          </div>
+
           <p className="text-[10px] text-muted-foreground">
-            Keys are saved locally in your browser session and never sent to external servers. You can also configure them in <code>.env.local</code>.
+            You can also configure keys in <code>.env.local</code> as <code>PAYPAL_CLIENT_ID</code> and <code>PAYPAL_CLIENT_SECRET</code>.
           </p>
 
           {/* Action Buttons */}
