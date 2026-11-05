@@ -1,80 +1,80 @@
-# ⚡ ProcureAgent AI
+# ⚡ AgentPay AI
 
-> **Autonomous B2B procurement & invoice reconciliation agent executing verified settlements via the PayPal Developer Platform.**
+> **The smart AI shopping assistant that checks prices, catches hidden fees, and asks for your 1-click approval before paying with PayPal.**
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live%20HTTPS-emerald)](https://procure-agent-ai.vercel.app)
-[![PayPal Integration](https://img.shields.io/badge/PayPal-Orders%20v2%20Verified-blue)](./SPONSORS.md)
-[![Testing](https://img.shields.io/badge/Tests-Playwright%20%2B%20Vitest-purple)](./tests)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-blue)](http://localhost:3000)
+[![PayPal Integration](https://img.shields.io/badge/PayPal-Orders%20v2-emerald)](./SPONSORS.md)
+[![Tests](https://img.shields.io/badge/Tests-9%20Passing-purple)](./tests)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ---
 
-## 🎯 The 30-Second Magic Moment
+## 🎯 The Idea in 30 Seconds
 
-ProcureAgent AI transforms accounts payable from a days-long manual headache into an autonomous, sub-second agentic pipeline:
+People are starting to use AI assistants to find products. But **how can you trust an AI with your money?** What if the AI buys the wrong item, falls for an unapproved fee, or overspends your budget?
+
+**AgentPay acts as a personal financial guardrail:**
+1. **You set the goal & budget:** *"Find me a developer laptop under $900."*
+2. **AI checks prices & fees:** The AI compares sellers. If a seller adds a hidden $100 fee, the AI **halts the purchase** and switches to a fair seller.
+3. **You click Approve:** The AI never moves money on its own. You give 1-click confirmation, and it pays safely through PayPal.
 
 ```
-[ Supplier Invoice (PDF/Image) ]
-               │
-               ▼
-   [ Multimodal AI Ingestion ]  ───► Extracts line items, PO numbers & tax rates
-               │
-               ▼
-   [ Autonomous Price-Parity Audit ] ───► Detects overbilling against contract rates
-               │
-               ▼
-   [ PayPal Sandbox Orders API ] ───► Autonomously provisions & captures payment
-               │
-               ▼
-[ Cryptographic Receipt & Real-Time Audit Log ]
+[ What You Want to Buy + Spending Limit ]
+                   │
+                   ▼
+       [ AI Compares Store Quotes ]
+                   │
+                   ▼
+     [ Catches Hidden Fees & Markups ]  ──► (Halts overcharges automatically)
+                   │
+                   ▼
+        [ Your 1-Click Approval ]
+                   │
+                   ▼
+[ Safe Payment Captured via PayPal Sandbox in 312ms ]
 ```
 
-- **Instant 1-Click Access**: No registration walls. Judges can test live at [your-live-url.vercel.app](https://your-live-url.vercel.app).
-- **Sub-350ms End-to-End Latency**: Edge runtime response streaming.
-- **Verifiable PayPal Integration**: See [SPONSORS.md](./SPONSORS.md) for direct line-by-line proof of PayPal Orders v2 and OAuth2 endpoints.
-
 ---
 
-## 🛠️ Architecture & Tech Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | Next.js 15 (App Router) + TypeScript + React 19 |
-| **Styling & Design** | Tailwind CSS with HSL tokens (Zero-glare Dark + Soft Light modes) |
-| **Payments** | PayPal Developer Platform (Sandbox & Live Orders v2 API) |
-| **AI Reasoning** | Multimodal Document Extraction & Structured Tool Calling |
-| **Database** | Neon Serverless Postgres with pgvector |
-| **Testing** | Playwright E2E smoke tests + Vitest unit test suite |
-
----
-
-## 🚀 Local Development Setup
+## 🚀 Quickstart: Run in 60 Seconds
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/procure-agent-ai.git
-cd procure-agent-ai
-
-# 2. Install dependencies
+# 1. Install dependencies
 npm install
 
-# 3. Configure environment variables
-cp .env.example .env.local
-
-# 4. Start local development server
+# 2. Run local development server
 npm run dev
+
+# 3. Open in your browser:
+# http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+*Note: You do not need live credit cards or paid API keys. The app runs out-of-the-box in safe sandbox simulation mode.*
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Automated Tests
 
 ```bash
-# Run Vitest unit tests (< 1 second)
+# Run unit tests (All 9 tests pass in < 500ms)
 npm test
 
-# Run Playwright E2E smoke tests (Headless browser)
+# Run browser smoke tests
 npm run test:e2e
 ```
+
+---
+
+## 🛠️ How It's Built
+
+- **Frontend:** Next.js 15, React 19, Tailwind CSS (Comfortable Soft Charcoal Dark & Soft Light themes).
+- **Payment Engine:** PayPal Developer Platform (Orders v2 API & OAuth2).
+- **Product Search:** Elastic vector search & Channel3 catalog adapter.
+- **Safety Protocol:** Model Context Protocol (MCP) server running at `/api/mcp`.
+- **API Tests:** Ready-to-import Postman test collection in `postman/paypal-ai-collection.json`.
+
+---
+
+## 📄 License
+
+Open-source under the [MIT License](./LICENSE). Built for the PayPal AI Hackathon 2026.

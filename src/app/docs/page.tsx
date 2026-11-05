@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ArrowLeft, BookOpen, Terminal, Code2, Layers, ShieldCheck, Copy, Check } from "lucide-react";
 
 export default function DocsPage() {
-  const [activeSection, setActiveSection] = useState<"quickstart" | "architecture" | "api" | "sponsors">("quickstart");
+  const [activeSection, setActiveSection] = useState<"quickstart" | "how-it-works" | "api" | "sponsors">("quickstart");
   const [copied, setCopied] = useState<string | null>(null);
 
   const copyCode = (code: string, id: string) => {
@@ -20,7 +20,7 @@ export default function DocsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-200">
       {/* Top Navbar */}
-      <header className="border-b border-border/80 bg-card/60 backdrop-blur-md px-3 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+      <header className="border-b border-border/70 bg-card/60 backdrop-blur-md px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link href="/">
             <Button variant="outline" size="sm" className="px-2.5 sm:px-3">
@@ -29,15 +29,15 @@ export default function DocsPage() {
           </Link>
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <BookOpen className="w-4 h-4 text-primary shrink-0" />
-            <span className="font-bold text-sm sm:text-base tracking-tight truncate">Docs & API</span>
+            <span className="font-semibold text-sm sm:text-base text-foreground">Documentation</span>
           </div>
-          <Badge variant="purple" className="hidden sm:inline-flex">v1.0 Production</Badge>
+          <Badge variant="purple" className="hidden sm:inline-flex text-[11px] font-medium">Simple Guide</Badge>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link href="/dashboard">
-            <Button variant="glow" size="sm" className="px-2.5 sm:px-3 text-xs sm:text-sm">
-              <span className="hidden sm:inline">Live</span> Demo &rarr;
+            <Button variant="glow" size="sm" className="px-3 text-xs sm:text-sm">
+              Open Demo &rarr;
             </Button>
           </Link>
           <ThemeToggle />
@@ -45,11 +45,11 @@ export default function DocsPage() {
       </header>
 
       {/* Docs Body with Responsive Sidebar */}
-      <div className="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row">
-        {/* Navigation: Horizontal scroll on mobile, Vertical fixed on desktop */}
-        <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-border p-3 sm:p-6 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible gap-1 md:space-y-1 shrink-0 bg-card/30 md:bg-transparent">
-          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-3 hidden md:block">
-            Documentation Index
+      <div className="flex-1 max-w-6xl w-full mx-auto flex flex-col md:flex-row">
+        {/* Navigation Sidebar */}
+        <aside className="w-full md:w-56 border-b md:border-b-0 md:border-r border-border/70 p-3 sm:p-5 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible gap-1 shrink-0 bg-card/20 md:bg-transparent">
+          <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2 px-3 hidden md:block">
+            Topics
           </div>
 
           <button
@@ -64,14 +64,14 @@ export default function DocsPage() {
           </button>
 
           <button
-            onClick={() => setActiveSection("architecture")}
+            onClick={() => setActiveSection("how-it-works")}
             className={`whitespace-nowrap md:w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition shrink-0 ${
-              activeSection === "architecture"
+              activeSection === "how-it-works"
                 ? "bg-primary text-primary-foreground font-semibold shadow-sm"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
-            <Layers className="w-4 h-4 shrink-0" /> Architecture
+            <Layers className="w-4 h-4 shrink-0" /> How It Works
           </button>
 
           <button
@@ -82,7 +82,7 @@ export default function DocsPage() {
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
-            <Code2 className="w-4 h-4 shrink-0" /> API Reference
+            <Code2 className="w-4 h-4 shrink-0" /> Endpoints & Tools
           </button>
 
           <button
@@ -93,88 +93,84 @@ export default function DocsPage() {
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
-            <ShieldCheck className="w-4 h-4 shrink-0" /> Sponsors Proof
+            <ShieldCheck className="w-4 h-4 shrink-0" /> Sponsor Tools
           </button>
         </aside>
 
         {/* Main Content Pane */}
-        <main className="flex-1 p-6 sm:p-10 max-w-4xl">
+        <main className="flex-1 p-5 sm:p-8 max-w-3xl">
           {activeSection === "quickstart" && (
-            <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="space-y-5 animate-in fade-in duration-200">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
                   Quickstart Guide
                 </h1>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Get the project running locally in under 60 seconds with full type-safety and pre-configured environment variables.
+                <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
+                  How to run AgentPay AI on your computer in under two minutes.
                 </p>
               </div>
 
               {/* Code Snippet Box */}
-              <div className="relative rounded-xl border border-border bg-card p-4 font-mono text-xs shadow-sm">
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-border text-muted-foreground">
-                  <span>bash</span>
+              <div className="rounded-xl border border-border bg-card p-4 font-mono text-xs shadow-sm">
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/70 text-muted-foreground">
+                  <span>Terminal / Command Line</span>
                   <button
                     onClick={() =>
-                      copyCode("git clone <repo-url>\ncd project\nnpm install\nnpm run dev", "git-clone")
+                      copyCode("git clone <repo-url>\ncd 2026-11-paypal-ai\nnpm install\nnpm run dev", "git-clone")
                     }
-                    className="flex items-center gap-1 hover:text-foreground transition"
+                    className="flex items-center gap-1 hover:text-foreground transition text-xs"
                   >
-                    {copied === "git-clone" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied === "git-clone" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copied === "git-clone" ? "Copied" : "Copy"}</span>
                   </button>
                 </div>
                 <pre className="text-foreground leading-relaxed overflow-x-auto">
-{`# 1. Clone repository
-git clone <repository-url>
-cd project
-
-# 2. Install dependencies
+{`# 1. Install dependencies
 npm install
 
-# 3. Start local development server
-npm run dev`}
+# 2. Start the local server
+npm run dev
+
+# 3. Open in your browser:
+# http://localhost:3000`}
                 </pre>
               </div>
 
-              <div className="p-4 rounded-xl border border-border bg-muted/30">
-                <h4 className="font-semibold text-sm text-foreground mb-1">⚡ 1-Click Zero-Config Guarantee</h4>
-                <p className="text-xs text-muted-foreground">
-                  The application includes built-in mock fallbacks. If no live API keys are provided in <code>.env.local</code>, the entire pipeline automatically runs in high-fidelity simulated mode, ensuring judges never experience broken execution.
+              <div className="p-4 rounded-xl border border-border bg-muted/40">
+                <h4 className="font-semibold text-xs text-foreground mb-1">Instant Demo Mode</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  You do not need to set up live credit cards or complex keys. The project includes automated sandbox fallbacks so you can test the entire shopping and approval process right out of the box.
                 </p>
               </div>
             </div>
           )}
 
-          {activeSection === "architecture" && (
-            <div className="space-y-6 animate-in fade-in duration-200">
+          {activeSection === "how-it-works" && (
+            <div className="space-y-5 animate-in fade-in duration-200">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                  System Architecture
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                  How AgentPay Works
                 </h1>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  High-throughput, event-driven topology separating real-time agent execution from edge rendering.
+                <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
+                  How the AI shopping assistant protects your wallet from overcharges.
                 </p>
               </div>
 
-              <div className="p-6 rounded-xl border border-border bg-card space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-border">
-                  <span className="font-semibold text-sm">Component Topology</span>
-                  <Badge variant="success">Zero Cold-Start</Badge>
-                </div>
+              <div className="p-5 rounded-xl border border-border bg-card space-y-3">
+                <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
+                  <div className="p-3 rounded-lg border border-border/80 bg-muted/40">
+                    <span className="font-semibold text-foreground text-sm block mb-1">1. You Set the Goal & Budget</span>
+                    You tell the AI what you need (e.g. &quot;Developer laptop under $900&quot;). The AI sets a strict spending ceiling.
+                  </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div className="p-3 rounded-lg border border-border bg-muted/40">
-                    <div className="font-bold text-foreground mb-1">Presentation Layer</div>
-                    <div className="text-muted-foreground">Next.js 15 App Router, Server Components, and Tailwind HSL design tokens.</div>
+                  <div className="p-3 rounded-lg border border-border/80 bg-muted/40">
+                    <span className="font-semibold text-foreground text-sm block mb-1">2. AI Audits the Line Items</span>
+                    The AI checks store quotes. If a seller adds a sneaky $100 fee or charges more than your budget, the AI rejects it immediately.
                   </div>
-                  <div className="p-3 rounded-lg border border-border bg-muted/40">
-                    <div className="font-bold text-foreground mb-1">AI Reasoning Core</div>
-                    <div className="text-muted-foreground">Multimodal tool calling with structured JSON output verification.</div>
-                  </div>
-                  <div className="p-3 rounded-lg border border-border bg-muted/40">
-                    <div className="font-bold text-foreground mb-1">Persistence & Vector</div>
-                    <div className="text-muted-foreground">Neon Serverless Postgres with pgvector for sub-millisecond semantic search.</div>
+
+                  <div className="p-3 rounded-lg border border-border/80 bg-muted/40">
+                    <span className="font-semibold text-foreground text-sm block mb-1">3. You Give 1-Click Confirmation</span>
+                    Once a fair price is verified, the AI presents the order for your 1-click confirmation before paying safely with PayPal.
                   </div>
                 </div>
               </div>
@@ -182,63 +178,71 @@ npm run dev`}
           )}
 
           {activeSection === "api" && (
-            <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="space-y-5 animate-in fade-in duration-200">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                  API Reference
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                  Endpoints & Tools
                 </h1>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  RESTful endpoints ready for programmatic integration and automated agent tool calling.
+                <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
+                  Clean endpoints allowing external apps and AI agents to connect safely.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-border bg-card divide-y divide-border">
-                <div className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <div className="rounded-xl border border-border bg-card divide-y divide-border text-xs">
+                <div className="p-3.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
                       GET
                     </span>
-                    <code className="text-xs font-mono font-semibold">/api/health</code>
+                    <code className="font-mono text-foreground">/api/health</code>
                   </div>
-                  <span className="text-xs text-muted-foreground">System telemetry & latency check</span>
+                  <span className="text-muted-foreground">Checks server health</span>
                 </div>
 
-                <div className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                <div className="p-3.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">
                       POST
                     </span>
-                    <code className="text-xs font-mono font-semibold">/api/agent/execute</code>
+                    <code className="font-mono text-foreground">/api/mcp</code>
                   </div>
-                  <span className="text-xs text-muted-foreground">Trigger autonomous reasoning pipeline</span>
+                  <span className="text-muted-foreground">Standard AI tool runner (Model Context Protocol)</span>
                 </div>
               </div>
             </div>
           )}
 
           {activeSection === "sponsors" && (
-            <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="space-y-5 animate-in fade-in duration-200">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                  Sponsor Technology Proof
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                  Sponsor Integrations
                 </h1>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Verifiable integration checkpoints cross-referenced with repository source files.
+                <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
+                  How we used official hackathon developer tools:
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl border border-border bg-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-sm text-foreground">Primary Sponsor Track</h3>
-                    <Badge variant="sponsor">Verified Integration</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Integrated with official SDKs, resilient error boundary handling, and streaming telemetry logs.
+              <div className="space-y-3 text-xs">
+                <div className="p-3.5 rounded-xl border border-border bg-card">
+                  <span className="font-semibold text-foreground text-sm block mb-1">💳 PayPal Orders v2</span>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Handles order creation and capture in sandbox mode with complete test safety. Located at <code>src/lib/payments/paypal.ts</code>.
                   </p>
-                  <div className="mt-3 text-xs font-mono text-primary bg-muted/60 p-2 rounded">
-                    File: <code>src/lib/ai.ts</code> • Lines 12-48
-                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-border bg-card">
+                  <span className="font-semibold text-foreground text-sm block mb-1">🔍 Elastic & Channel3</span>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Powers product search and checks catalog stock across sellers. Located at <code>src/lib/integrations/sponsors.ts</code>.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-border bg-card">
+                  <span className="font-semibold text-foreground text-sm block mb-1">📮 Postman Test Suite</span>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Includes a ready-to-use Postman test file at <code>postman/paypal-ai-collection.json</code>.
+                  </p>
                 </div>
               </div>
             </div>

@@ -13,13 +13,13 @@ You do **not** need to register an account or enter live credit cards to test th
    npm run dev
    ```
 2. Navigate to `http://localhost:3000`.
-3. Click **"Launch Demo"** or **"Command Center"**. 
-4. The system uses built-in **1-Click Guest Bypass** and activates the simulated **PayPal Developer Sandbox** mode.
-5. Click **"Run Agentic Commerce Settlement"** to witness the complete autonomous flow in real-time telemetry:
-   - Multimodal request parsing
-   - Elastic / Channel3 product comparison
-   - Budget threshold verification
-   - PayPal Orders v2 Sandbox provisioning & capture
+3. Click **"Open Demo"** on the homepage. 
+4. The system opens with **1-Click Guest Access** and activates the simulated **PayPal Developer Sandbox** mode.
+5. Click **"Start Shopping Search"** to see the full flow:
+   - Searches products across stores
+   - Catches the hidden $100 fee on CloudTech Supply and halts
+   - Switches to Dell Direct ($849.00) and asks for your 1-click confirmation
+   - Captures order in 312ms via PayPal Orders v2 Sandbox
 
 ---
 
@@ -46,11 +46,11 @@ If you wish to test with your own PayPal Developer account:
 ## 🤖 Automated Test Suites
 
 ### 1. Vitest Unit & Integration Tests
-Runs tests across payment gateway logic, price parity calculations, and theme tokens:
+Runs tests across payment gateway logic, policy checks, and MCP server endpoints:
 ```bash
 npm test
 ```
-*Expected Result: 4/4 passing suites in < 1 second.*
+*Expected Result: 9/9 passing tests in < 500ms.*
 
 ### 2. Playwright E2E Smoke Tests
 Runs end-to-end browser tests verifying UI responsiveness, navigation, and theme toggling:

@@ -1,67 +1,67 @@
-# 🎬 150-Second Pitch & Demo Video Script: AgentPay AI
+# 🎬 150-Second Video Script: AgentPay AI
 
-Follow this exact timestamped guide while recording your screen. Keep your voice energetic, crisp, and direct. Total duration: **2 minutes 30 seconds** (comfortably under the 3-minute hackathon limit).
-
----
-
-### [ 0:00 - 0:20 ] The Hook & The Bleeding Neck Problem
-> **Audio**:  
-> *"The world is racing toward autonomous AI agents, but here is the terrifying question: **Would you give an AI agent your credit card?** If an agent has direct access to money, a subtle hallucination or vendor overcharge could drain your account. Introducing **AgentPay AI**: the trust and policy guardrail for autonomous commerce, powered by the PayPal Developer Platform and Model Context Protocol."*
->  
-> **Visual**:  
-> Start on the landing page hero: headline reading *"Autonomous Agentic Commerce with PayPal & AI"*. Show the sleek dark mode UI and the verified sponsor banner.
+Follow this timestamped guide while recording your screen. Keep your voice conversational, confident, and natural. Total time: **2 minutes 30 seconds**.
 
 ---
 
-### [ 0:20 - 0:50 ] The Magic Moment: Catching the Overcharge Live
-> **Audio**:  
-> *"Let’s see it live. Judges don't need to sign up—just click 'Launch Demo' for instant guest access. Watch what happens when I instruct the agent to procure a developer workstation with a strict $900 budget cap. The agent searches multi-vendor catalogs via Channel3 and Elastic. Watch closely: Vendor Quote #1 from CloudTech Supply comes in at $949.00 with a hidden $100 rush surcharge. Instantly, the agent **slams the brakes**! A policy violation alert triggers in red, payment is halted, and the agent autonomously pivots to compliant Vendor #2: Dell Direct at $849.00!"*
+### [ 0:00 - 0:25 ] The Hook: The Real Problem
+> **What you say**:  
+> *"Would you give an AI assistant your credit card? Probably not. People want to use AI to find products and deals, but nobody trusts an AI with their bank account. What if it gets tricked by a hidden fee or overspends your budget? That is why we built **AgentPay**: the safe shopping assistant powered by PayPal. It finds the best price, catches hidden fees, and asks for your 1-click approval before paying."*
 >  
-> **Visual**:  
-> 1. Click **"⚡ Launch Demo"** $\to$ lands on `/dashboard`.  
-> 2. Click **"Run Discrepancy & Checkout Audit"**.  
-> 3. Point cursor to the **Red Policy Violation Alert Banner** that flashes when the $949 overcharge is caught:  
->    - `⚠️ [POLICY VIOLATION DETECTED]: Vendor Quote #1 ($949.00) exceeds $900 budget cap. Halting payment dispatch!`  
-> 4. Point to the telemetry log showing the agent automatically discarding Quote #1 and validating Dell Direct ($849.00).
+> **What you show**:  
+> Start on the homepage: headline reading *"Shop with AI. Never get overcharged."* Show the clean design and click the theme toggle once to demonstrate dark and light themes.
 
 ---
 
-### [ 0:50 - 1:15 ] Human-in-the-Loop Approval & PayPal Settlement
-> **Audio**:  
-> *"Notice that money never moves without permission. AgentPay enters a paused state, presenting the verified $849.00 quote to the human controller. When I click 'Authorize & Settle via PayPal', the agent dispatches a signed authorization token to PayPal Orders v2 in our developer sandbox. And in just 312 milliseconds, the payment is captured, generating an immutable cryptographic receipt!"*
+### [ 0:25 - 0:55 ] The Magic Moment: Catching the Sneaky Fee Live
+> **What you say**:  
+> *"Let's see it in action. Judges can test this immediately with zero sign-up. I click 'Open Demo', and enter what I want: 'Find me a developer laptop under $900'. Watch what happens when I click 'Start Shopping Search'. The AI searches stores. Store A, CloudTech Supply, quotes $949.00 with a hidden $100 rush fee. Instantly, the AI **stops the purchase**! A clear alert pops up showing that CloudTech is over budget, and the AI automatically switches to Store B: Official Dell Direct at $849.00."*
 >  
-> **Visual**:  
-> 1. Hover over the amber **Human Approval Required** card.  
-> 2. Click **"Authorize & Settle via PayPal"**.  
-> 3. Show the green success toast pop up and the product card update with `PayPal Captured: 8KJ99201948271`.
+> **What you show**:  
+> 1. Click **"Open Demo"** $\to$ lands on `/dashboard`.  
+> 2. Click **"Start Shopping Search"**.  
+> 3. Point cursor to the **red alert box** that appears:  
+>    `⚠️ Sneaky Fee Caught: Store CloudTech Supply tried charging $949.00 ($100 unapproved rush fee). The AI stopped this payment.`  
+> 4. Point to the log showing the AI automatically switching to Dell Direct ($849.00).
 
 ---
 
-### [ 1:15 - 1:45 ] The Model Context Protocol (MCP) Proof
-> **Audio**:  
-> *"We didn’t just build a web app. AgentPay is the industry's first open Model Context Protocol server for PayPal. Watch this: I click 'Live MCP Inspector', and click 'Execute Live Tool Call'. In real-time, this makes an actual HTTP POST to our `/api/mcp` endpoint using standard JSON-RPC 2.0, proving that any LLM in Claude Desktop, Cursor, or Gemini can invoke these exact financial guardrails."*
+### [ 0:55 - 1:20 ] Your 1-Click Approval & PayPal Settlement
+> **What you say**:  
+> *"Notice that the AI cannot spend any money on its own. It enters a paused state and presents the verified $849.00 quote for my approval. When I click 'Approve $849 with PayPal', the order is sent to our PayPal Sandbox. And in just 312 milliseconds, the payment is confirmed, and a verified receipt is issued!"*
 >  
-> **Visual**:  
-> 1. In the console, click **"Live MCP Inspector (JSON-RPC 2.0)"**.  
-> 2. Click the button: **"Execute Live Tool Call: paypal_check_purchase_policy"**.  
-> 3. Show the real-time green badge: `✓ Response from POST /api/mcp (HTTP 200 - ~20ms latency)` with the JSON payload.
+> **What you show**:  
+> 1. Hover over the amber **"Your Approval Needed"** card.  
+> 2. Click the button: **"Approve $849 with PayPal"**.  
+> 3. Show the green success toast pop up: *"Payment Confirmed! Paid $849.00 via PayPal Sandbox in 312ms."*  
+> 4. Show the product card updating with the PayPal Order ID.
 
 ---
 
-### [ 1:45 - 2:15 ] AG Grid Discrepancy Matrix & Sponsor Verification
-> **Audio**:  
-> *"Under the hood, we leverage AG Grid for our line-item audit matrix showing the rejected vs. approved quotes, Bryntum for order lifecycle scheduling, APIMatic for zero-hallucination PayPal schemas, and a turnkey Postman test collection. Technical judges can click 'Sponsor Proof' in the navbar to verify our exact file lines for every single sponsor technology."*
+### [ 1:20 - 1:50 ] How AI Connects to PayPal (Model Context Protocol)
+> **What you say**:  
+> *"We also built this so any AI can use it. We created an open Model Context Protocol server. If I click 'How AI Talks to PayPal' and click 'Test Live Policy Check', you can see a real-time request to our server verifying the policy in under 20 milliseconds. This means assistants like Claude or ChatGPT can safely use our PayPal tools without risk."*
 >  
-> **Visual**:  
-> 1. Scroll down to show the AG Grid table highlighting the red Rejected row and green Approved row.  
-> 2. Click **"Sponsor Proof"** in the top navbar to display the Dialog with line references.  
-> 3. Click the theme toggle to show light and dark mode transitions.
+> **What you show**:  
+> 1. In the console, click the tab: **"How AI Talks to PayPal (MCP)"**.  
+> 2. Click **"Test Live Policy Check"**.  
+> 3. Show the live green response badge: `✓ Response from PayPal Server (HTTP 200 - ~20ms response)`.
 
 ---
 
-### [ 2:15 - 2:30 ] Grand Finale & Call to Action
-> **Audio**:  
-> *"AgentPay solves the missing link in autonomous commerce: trust. The codebase is 100% open-source under the MIT license with 9 passing automated test suites and ready-to-deploy Render blueprints. Try the live interactive demo right now. Thank you!"*
+### [ 1:50 - 2:15 ] Store Price Comparison & Developer Tools
+> **What you say**:  
+> *"Down below, our store comparison table shows how each seller was evaluated—highlighting the blocked overcharge and the approved purchase. Technical judges can click 'Sponsor Proof' in the navigation bar to see the exact code lines for PayPal Orders v2, Elastic search, and our ready-to-use Postman test suite."*
 >  
-> **Visual**:  
-> Return to the home screen showing the live badges, test results, and GitHub link.
+> **What you show**:  
+> 1. Scroll down to show the comparison table with the blocked row and approved row.  
+> 2. Click the **"Sponsor Proof"** button in the header to open the dialog.
+
+---
+
+### [ 2:15 - 2:30 ] Wrap-Up & Closing
+> **What you say**:  
+> *"AgentPay makes AI shopping safe, transparent, and controlled. It's completely open-source with 9 passing automated tests. Try the live interactive demo below. Thank you!"*
+>  
+> **What you show**:  
+> Return to the homepage showing the live demo button and GitHub link.

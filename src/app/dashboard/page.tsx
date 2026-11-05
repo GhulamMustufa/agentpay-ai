@@ -8,33 +8,29 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Dialog } from "@/components/ui/Dialog";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useToast } from "@/components/ui/Toast";
-import { DEMO_METRICS } from "@/lib/demo-data";
 import {
   ArrowLeft,
   Play,
   CheckCircle2,
   Loader2,
   Terminal,
-  Activity,
-  TrendingUp,
-  Layers,
-  Code2,
-  ShoppingCart,
   ShieldCheck,
   Check,
-  Clock,
   Sparkles,
   AlertTriangle,
   Lock,
   Send,
   XCircle,
+  Code2,
+  Wallet,
+  PiggyBank,
 } from "lucide-react";
 
 export default function DashboardPage() {
   const { toast } = useToast();
   const [isRunning, setIsRunning] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userPrompt, setUserPrompt] = useState("Find me a high-performance developer workstation under $900 with 16GB RAM");
+  const [userPrompt, setUserPrompt] = useState("Find me a high-performance developer laptop under $900 with 16GB RAM");
 
   // Discrepancy & Policy State
   const [policyAlert, setPolicyAlert] = useState<{
@@ -51,15 +47,13 @@ export default function DashboardPage() {
     name: string;
     price: string;
     specs: string;
-    score: string;
     merchant: string;
   } | null>(null);
 
   const [logs, setLogs] = useState<string[]>([
-    "[System Initialized]: AgentPay Trust Layer connected to PayPal Developer Gateway (Sandbox).",
-    "[Integrations Active]: Channel3 (Catalog API), Elastic (Vector Index), APIMatic (OpenAPI Specs).",
-    "[Policy Active]: Max Session Budget Cap enforced at $900.00 USD.",
-    "[Ready]: Awaiting purchase instructions...",
+    "System ready. Connected to PayPal Sandbox gateway.",
+    "Spending limit active: Max budget cap set at $900.00.",
+    "Ready. Enter what you want to buy and click search.",
   ]);
 
   const [status, setStatus] = useState<"idle" | "running" | "paused_for_approval" | "success">("idle");
@@ -85,27 +79,26 @@ export default function DashboardPage() {
 
     setLogs((prev) => [
       ...prev,
-      `[Astropods Agent]: Processing user prompt: "${userPrompt}"`,
-      "[Channel3 API]: Ingesting multi-vendor quotations for 'developer workstation'...",
+      `Step 1: Searching verified stores for "${userPrompt}"...`,
+      "Comparing seller prices, warranties, and stock availability...",
     ]);
 
     // Step 2: The Discrepancy Trap (Vendor #1 Overcharge Detected)
     setTimeout(() => {
       setStep(2);
       setPolicyAlert({
-        vendor: "CloudTech Supply Distro",
+        vendor: "CloudTech Supply",
         quotedAmount: "$949.00",
         budgetCap: "$900.00",
         markup: "$100.00",
-        reason: "Unauthorized surcharge ($100 rush fee) detected. Exceeds $900.00 budget cap by $49.00.",
+        reason: "Hidden $100 rush fee detected. Total price is $49.00 over your $900 budget limit.",
       });
 
       setLogs((prev) => [
         ...prev,
-        "[Elastic Vector Search]: Retrieved 3 candidate vendor quotes.",
-        "🚨 [POLICY VIOLATION DETECTED]: Vendor Quote #1 (CloudTech Supply @ $949.00) exceeds $900.00 budget cap by $49.00!",
-        "⛔ [Trust Layer Guardrail]: Detected unapproved $100.00 line-item markup. Halting payment dispatch!",
-        "🔄 [Autonomous Pivot]: Discarding CloudTech quote. Evaluating Vendor Quote #2 (Dell Direct Verified)...",
+        "⚠️ Hidden Fee Caught: CloudTech Supply quoted $949.00 ($100 unapproved rush fee).",
+        "Payment halted. The AI rejected CloudTech Supply to protect your budget.",
+        "Step 2: Switching to alternative seller: Official Dell Direct...",
       ]);
     }, 1000);
 
@@ -116,24 +109,23 @@ export default function DashboardPage() {
         id: "c3-prod-101",
         name: "Dell XPS 13 Developer Edition",
         price: "$849.00",
-        specs: "Intel Core i7-1360P • 16GB LPDDR5 • 512GB NVMe SSD • Ubuntu/Win Certified",
-        score: "98% Match",
-        merchant: "Official Dell Direct (PayPal Verified Partner)",
+        specs: "Intel Core i7 • 16GB RAM • 512GB SSD • 1-Year Warranty",
+        merchant: "Official Dell Direct (PayPal Verified Seller)",
       });
 
       setLogs((prev) => [
         ...prev,
-        "✅ [Parity Verified]: Dell Direct Quote ($849.00) verified 100% rate parity. ($51.00 under budget cap).",
-        "[APIMatic Context]: Formulated PayPal Orders v2 payload validated against OpenAPI 3.0 schema.",
-        "✋ [Human-in-the-Loop]: Requiring cryptographic authorization token from procurement manager...",
+        "✓ Match Verified: Dell Direct quoted $849.00 with fair pricing ($51.00 under your budget).",
+        "Step 3: Prepared PayPal checkout order.",
+        "✋ Waiting for your 1-click confirmation before paying...",
       ]);
 
       setIsRunning(false);
       setPendingApproval(true);
       setStatus("paused_for_approval");
       toast({
-        title: "Discrepancy Caught & Bypassed",
-        description: "Agent rejected $949 overcharge. Dell Direct ($849.00) awaiting your 1-click authorization.",
+        title: "Overcharge Stopped",
+        description: "AI rejected $949 fee. Dell Direct ($849.00) is ready for your approval.",
         type: "success",
       });
     }, 2200);
@@ -147,24 +139,24 @@ export default function DashboardPage() {
 
     setLogs((prev) => [
       ...prev,
-      "🔑 [Authorization Granted]: Cryptographic approval token signed by controller (Hash: 0x8F91...2A).",
-      "[PayPal Sandbox API]: Dispatched POST /v2/checkout/orders (Intent: CAPTURE, Amount: $849.00 USD)...",
+      "You clicked Approve. Sending payment confirmation to PayPal Sandbox...",
+      "Connecting to PayPal Orders API...",
     ]);
 
     setTimeout(() => {
       setStep(4);
       setLogs((prev) => [
         ...prev,
-        "✨ [Success]: Captured PayPal Order ID #8KJ99201948271! Receipt issued. Order dispatched in 312ms!",
+        "✨ Payment Successful! PayPal Order ID #8KJ99201948271 captured in 312ms. Receipt sent to your account.",
       ]);
       setIsRunning(false);
       setStatus("success");
       toast({
-        title: "PayPal Settlement Confirmed!",
-        description: "Order #8KJ99201948271 captured for Dell XPS 13 ($849.00) in 312ms.",
+        title: "Payment Confirmed!",
+        description: "Paid $849.00 via PayPal Sandbox in 312ms. Order confirmed.",
         type: "success",
       });
-    }, 1200);
+    }, 1100);
   };
 
   // Execute Real Live MCP Call to /api/mcp
@@ -182,7 +174,7 @@ export default function DashboardPage() {
           params: {
             name: "paypal_check_purchase_policy",
             arguments: {
-              vendorName: "CloudTech Supply Distro",
+              vendorName: "CloudTech Supply",
               quotedAmount: 949.0,
               budgetCap: 900.0,
               unapprovedMarkup: 100.0,
@@ -212,224 +204,212 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-200">
       {/* Top Navbar */}
-      <header className="border-b border-border/80 bg-card/60 backdrop-blur-md px-3 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+      <header className="border-b border-border/70 bg-card/60 backdrop-blur-md px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link href="/">
             <Button variant="outline" size="sm" className="px-2.5 sm:px-3">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Back
+              <ArrowLeft className="w-4 h-4 mr-1" /> Home
             </Button>
           </Link>
-          <span className="font-bold text-sm sm:text-lg tracking-tight truncate">AgentPay Trust Layer</span>
-          <Badge variant="success" className="hidden sm:inline-flex">● PayPal Sandbox Live</Badge>
+          <span className="font-semibold text-sm sm:text-base tracking-tight truncate text-foreground">
+            Shopping Demo & Dashboard
+          </span>
+          <Badge variant="success" className="hidden sm:inline-flex text-[11px] font-medium">
+            ● Demo Active
+          </Badge>
         </div>
+
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)} className="px-2.5 sm:px-3 text-xs sm:text-sm">
-            <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" /> <span className="hidden sm:inline">Sponsor</span> Proof
+            <Code2 className="w-3.5 h-3.5 mr-1" /> Sponsor Proof
           </Button>
           <ThemeToggle />
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        {/* Metric Cards Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="glass">
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center justify-between text-xs">
-                <span>Active Sessions</span>
-                <Activity className="w-4 h-4 text-primary" />
+      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-5">
+        {/* Simple 3 Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+          <Card className="glass p-4">
+            <CardHeader className="p-0 pb-1">
+              <CardDescription className="flex items-center justify-between text-xs text-muted-foreground font-normal">
+                <span>Your Spending Limit</span>
+                <Wallet className="w-4 h-4 text-primary" />
               </CardDescription>
-              <CardTitle className="text-xl sm:text-2xl font-bold">{DEMO_METRICS.activeSessions}</CardTitle>
+              <CardTitle className="text-xl font-bold text-foreground">$900.00 Max</CardTitle>
             </CardHeader>
+            <p className="text-[11px] text-muted-foreground mt-1">Strict limit enforced by AI</p>
           </Card>
 
-          <Card className="glass">
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center justify-between text-xs">
-                <span>Policy Enforcement</span>
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          <Card className="glass p-4">
+            <CardHeader className="p-0 pb-1">
+              <CardDescription className="flex items-center justify-between text-xs text-muted-foreground font-normal">
+                <span>Overcharges Stopped</span>
+                <PiggyBank className="w-4 h-4 text-emerald-400" />
               </CardDescription>
-              <CardTitle className="text-xl sm:text-2xl font-bold text-emerald-500">
-                100% Guarded
-              </CardTitle>
+              <CardTitle className="text-xl font-bold text-emerald-400">$100.00 Saved</CardTitle>
             </CardHeader>
+            <p className="text-[11px] text-muted-foreground mt-1">Hidden rush fee caught & rejected</p>
           </Card>
 
-          <Card className="glass">
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center justify-between text-xs">
-                <span>Decision Latency</span>
-                <TrendingUp className="w-4 h-4 text-amber-500" />
+          <Card className="glass p-4">
+            <CardHeader className="p-0 pb-1">
+              <CardDescription className="flex items-center justify-between text-xs text-muted-foreground font-normal">
+                <span>PayPal Sandbox</span>
+                <ShieldCheck className="w-4 h-4 text-blue-400" />
               </CardDescription>
-              <CardTitle className="text-xl sm:text-2xl font-bold">{DEMO_METRICS.avgLatency}</CardTitle>
+              <CardTitle className="text-xl font-bold text-foreground">Connected</CardTitle>
             </CardHeader>
-          </Card>
-
-          <Card className="glass">
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center justify-between text-xs">
-                <span>Processed Volume</span>
-                <Layers className="w-4 h-4 text-purple-500" />
-              </CardDescription>
-              <CardTitle className="text-xl sm:text-2xl font-bold">{DEMO_METRICS.totalVolumeProcessed}</CardTitle>
-            </CardHeader>
+            <p className="text-[11px] text-muted-foreground mt-1">Safe test payment environment</p>
           </Card>
         </div>
 
-        {/* The Magic Moment Interactive Runner */}
-        <Card className="border-primary/30 bg-card/70 shadow-lg relative overflow-hidden">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* The Interactive Shopping Search Card */}
+        <Card className="glass border-border/80 shadow-sm relative overflow-hidden">
+          <CardHeader className="p-5 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <span>⚡ Autonomous Procurement & Trust Guardrail</span>
-                  <Badge variant="sponsor">PayPal + AI</Badge>
+                <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2">
+                  <span>Smart AI Shopping Assistant</span>
+                  <Badge variant="purple" className="text-[10px] font-medium">Safe Mode</Badge>
                 </CardTitle>
-                <CardDescription className="mt-1 text-xs sm:text-sm">
-                  Detects quote markups, halts unauthorized overspending, and executes permission-bounded PayPal Orders v2 settlement.
+                <CardDescription className="mt-1 text-xs text-muted-foreground font-normal">
+                  Searches stores, stops overcharges, and asks for your 1-click confirmation before paying.
                 </CardDescription>
               </div>
+
               <Button
                 variant="glow"
                 size="md"
                 onClick={runAgenticCommerceFlow}
                 disabled={isRunning || pendingApproval}
-                className="whitespace-nowrap"
+                className="whitespace-nowrap font-medium text-xs sm:text-sm"
               >
                 {isRunning ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Auditing & Routing...</span>
+                    <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                    <span>Searching Stores...</span>
                   </>
                 ) : (
                   <>
-                    <Play className="w-4 h-4 fill-current" />
-                    <span>Run Discrepancy & Checkout Audit</span>
+                    <Play className="w-3.5 h-3.5 fill-current mr-1.5" />
+                    <span>Start Shopping Search</span>
                   </>
                 )}
               </Button>
             </div>
 
-            {/* Prompt Input Area */}
-            <div className="mt-4 pt-3 border-t border-border flex flex-col sm:flex-row items-center gap-2">
-              <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Purchase Intent:</span>
+            {/* Prompt Input */}
+            <div className="mt-3 pt-3 border-t border-border/60 flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <span className="text-xs text-muted-foreground font-medium shrink-0">I want to buy:</span>
               <input
                 type="text"
                 value={userPrompt}
                 onChange={(e) => setUserPrompt(e.target.value)}
                 disabled={isRunning || pendingApproval}
-                className="w-full text-xs font-sans px-3 py-2 rounded-md bg-muted/60 border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full text-xs font-normal px-3 py-2 rounded-md bg-muted/50 border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            {/* Bryntum-Inspired Order Lifecycle Timeline */}
-            <div className="p-3 bg-muted/40 rounded-lg border border-border">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-primary" /> Bryntum Order & Guardrail Lifecycle
-                </span>
-                <span className="text-[10px] text-muted-foreground font-mono">Stage: {step}/4</span>
+          <CardContent className="p-5 pt-2 space-y-3.5">
+            {/* Visual Step Progress */}
+            <div className="grid grid-cols-4 gap-2 text-center text-xs pt-1">
+              <div className={`p-2 rounded-md border ${step >= 1 ? "bg-primary/15 border-primary/40 text-foreground font-medium" : "border-border/60 text-muted-foreground"}`}>
+                1. Search Stores
               </div>
-              <div className="grid grid-cols-4 gap-2 text-center text-xs">
-                <div className={`p-2 rounded border ${step >= 1 ? "bg-primary/20 border-primary text-foreground font-medium" : "border-border text-muted-foreground"}`}>
-                  1. Ingestion (Channel3)
-                </div>
-                <div className={`p-2 rounded border ${step >= 2 ? (policyAlert ? "bg-rose-500/20 border-rose-500 text-rose-400 font-medium" : "bg-primary/20 border-primary text-foreground") : "border-border text-muted-foreground"}`}>
-                  2. Policy Audit (Elastic)
-                </div>
-                <div className={`p-2 rounded border ${step >= 3 ? "bg-amber-500/20 border-amber-500 text-amber-400 font-medium" : "border-border text-muted-foreground"}`}>
-                  3. Human Approval Gate
-                </div>
-                <div className={`p-2 rounded border ${step >= 4 ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 font-medium" : "border-border text-muted-foreground"}`}>
-                  4. PayPal Captured
-                </div>
+              <div className={`p-2 rounded-md border ${step >= 2 ? (policyAlert ? "bg-rose-500/15 border-rose-500/40 text-rose-300 font-medium" : "bg-primary/15 border-primary/40 text-foreground") : "border-border/60 text-muted-foreground"}`}>
+                2. Check Fees
+              </div>
+              <div className={`p-2 rounded-md border ${step >= 3 ? "bg-amber-500/15 border-amber-500/40 text-amber-300 font-medium" : "border-border/60 text-muted-foreground"}`}>
+                3. Your Approval
+              </div>
+              <div className={`p-2 rounded-md border ${step >= 4 ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300 font-medium" : "border-border/60 text-muted-foreground"}`}>
+                4. Paid via PayPal
               </div>
             </div>
 
-            {/* THE SHOWSTOPPER: Policy Violation Alert Banner */}
+            {/* OVERCHARGE ALERT: Clear and friendly */}
             {policyAlert && (
-              <div className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/40 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+              <div className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 animate-in fade-in">
                 <div className="flex items-start gap-2.5">
-                  <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-rose-500 text-sm">Policy Violation Discrepancy Caught!</span>
-                    <p className="text-muted-foreground mt-0.5">
-                      Vendor <span className="font-semibold text-foreground">{policyAlert.vendor}</span> quoted{" "}
-                      <span className="font-mono font-bold text-rose-400">{policyAlert.quotedAmount}</span> (Budget cap: {policyAlert.budgetCap}). {policyAlert.reason}
+                    <span className="font-semibold text-rose-400">Sneaky Fee Caught & Blocked</span>
+                    <p className="text-muted-foreground mt-0.5 font-normal">
+                      Store <span className="text-foreground font-medium">{policyAlert.vendor}</span> tried charging{" "}
+                      <span className="text-rose-400 font-semibold">{policyAlert.quotedAmount}</span> ({policyAlert.reason}). The AI stopped this payment.
                     </p>
                   </div>
                 </div>
-                <Badge variant="destructive" className="shrink-0 uppercase text-[10px]">Payment Halted by Agent</Badge>
+                <Badge variant="destructive" className="shrink-0 text-[10px] font-medium">Overcharge Blocked</Badge>
               </div>
             )}
 
-            {/* HUMAN-IN-THE-LOOP APPROVAL CARD */}
+            {/* 1-CLICK APPROVAL CARD */}
             {pendingApproval && selectedProduct && (
-              <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in">
+              <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-amber-500" />
-                    <span className="text-sm font-bold text-foreground">Human Approval Required</span>
-                    <Badge variant="outline" className="border-amber-500/50 text-amber-500">Spending Gate</Badge>
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm font-semibold text-foreground">Your Approval Needed</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Agent selected compliant candidate: <span className="font-semibold text-foreground">{selectedProduct.name}</span> ({selectedProduct.price}) from {selectedProduct.merchant}.
+                  <p className="text-xs text-muted-foreground font-normal">
+                    The AI found a verified match: <span className="text-foreground font-medium">{selectedProduct.name}</span> for <span className="font-semibold text-foreground">{selectedProduct.price}</span> from {selectedProduct.merchant}.
                   </p>
-                  <p className="text-[11px] text-emerald-500 font-medium">✓ 100% Rate Parity Verified • $51.00 under budget cap</p>
+                  <p className="text-[11px] text-emerald-400 font-normal">✓ Fair price verified • $51.00 under your budget</p>
                 </div>
                 <Button
                   variant="glow"
                   size="sm"
                   onClick={handleAuthorizeSettlement}
                   disabled={isRunning}
-                  className="shrink-0 whitespace-nowrap bg-amber-600 hover:bg-amber-500 text-white font-semibold"
+                  className="shrink-0 whitespace-nowrap bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs px-4 py-2"
                 >
-                  <Send className="w-3.5 h-3.5 mr-1" /> Authorize & Settle via PayPal
+                  <Send className="w-3.5 h-3.5 mr-1.5" /> Approve ${selectedProduct.price.replace("$", "")} with PayPal
                 </Button>
               </div>
             )}
 
-            {/* Selected Product Card (Post-Approval) */}
+            {/* PRODUCT CARD: Post-Approval */}
             {status === "success" && selectedProduct && (
-              <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in">
-                <div className="space-y-1">
+              <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+                <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     <span className="text-base font-bold text-foreground">{selectedProduct.name}</span>
-                    <Badge variant="success">{selectedProduct.score}</Badge>
+                    <Badge variant="success" className="text-[10px]">Verified Match</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{selectedProduct.specs}</p>
-                  <p className="text-[11px] text-emerald-500 font-medium">Settled Merchant: {selectedProduct.merchant}</p>
+                  <p className="text-xs text-muted-foreground font-normal">{selectedProduct.specs}</p>
+                  <p className="text-[11px] text-emerald-400 font-normal">Purchased from: {selectedProduct.merchant}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-xl font-mono font-bold text-emerald-400">{selectedProduct.price}</div>
-                  <span className="text-[10px] text-muted-foreground block font-mono">PayPal Captured: 8KJ99201948271</span>
+                  <div className="text-lg font-bold text-emerald-400">{selectedProduct.price}</div>
+                  <span className="text-[10px] text-muted-foreground block font-mono">PayPal Order #8KJ99201948271</span>
                 </div>
               </div>
             )}
 
-            {/* Terminal Log & Live MCP Inspector Console */}
-            <div className="bg-muted/70 border border-border rounded-lg p-4 font-mono text-xs text-foreground space-y-1.5 shadow-inner min-h-[160px]">
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/80 text-muted-foreground">
+            {/* Console / Activity Log */}
+            <div className="bg-muted/40 border border-border/70 rounded-lg p-3.5 font-mono text-xs text-foreground space-y-1.5">
+              <div className="flex items-center justify-between pb-2 mb-1.5 border-b border-border/60 text-muted-foreground font-sans">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setActiveConsoleTab("telemetry")}
-                    className={`flex items-center gap-1.5 font-sans font-semibold text-xs px-2.5 py-1 rounded transition-colors ${activeConsoleTab === "telemetry" ? "bg-card text-foreground border border-border" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded transition-colors ${activeConsoleTab === "telemetry" ? "bg-card text-foreground font-medium border border-border/80" : "text-muted-foreground hover:text-foreground"}`}
                   >
-                    <Terminal className="w-3.5 h-3.5 text-primary" /> Live Telemetry Log
+                    <Terminal className="w-3.5 h-3.5 text-primary" /> Live Activity Log
                   </button>
                   <button
                     onClick={() => setActiveConsoleTab("mcp")}
-                    className={`flex items-center gap-1.5 font-sans font-semibold text-xs px-2.5 py-1 rounded transition-colors ${activeConsoleTab === "mcp" ? "bg-card text-foreground border border-border" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded transition-colors ${activeConsoleTab === "mcp" ? "bg-card text-foreground font-medium border border-border/80" : "text-muted-foreground hover:text-foreground"}`}
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-purple-400" /> Live MCP Inspector (JSON-RPC 2.0)
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" /> How AI Talks to PayPal (MCP)
                   </button>
                 </div>
-                <span className="text-[10px] text-emerald-500 font-semibold uppercase">
-                  STATUS: {status}
+                <span className="text-[10px] text-emerald-400 font-medium">
+                  Status: {status === "idle" ? "Ready" : status === "running" ? "Working..." : status === "paused_for_approval" ? "Awaiting You" : "Complete"}
                 </span>
               </div>
 
@@ -437,66 +417,52 @@ export default function DashboardPage() {
                 logs.map((log, index) => (
                   <div key={index} className="leading-relaxed">
                     <span className="text-muted-foreground">&gt; </span>
-                    <span className={log.includes("Success") || log.includes("Verified") ? "text-emerald-500 font-semibold" : log.includes("POLICY VIOLATION") || log.includes("Halting") ? "text-rose-400 font-semibold" : ""}>
+                    <span className={log.includes("Successful") || log.includes("Verified") ? "text-emerald-400 font-normal" : log.includes("Caught") || log.includes("halted") ? "text-rose-300 font-normal" : "text-foreground font-normal"}>
                       {log}
                     </span>
                   </div>
                 ))
               ) : (
-                <div className="space-y-3 text-[11px] font-mono leading-relaxed text-muted-foreground">
-                  <div className="flex items-center justify-between">
-                    <span className="text-primary font-semibold">// Interactive Model Context Protocol (MCP) Live Client</span>
+                <div className="space-y-2 text-xs font-sans text-muted-foreground">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <p className="text-xs text-foreground font-normal">
+                      Any AI (like Claude or ChatGPT) can use our safe PayPal tools via Model Context Protocol (MCP).
+                    </p>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={handleTestLiveMcpCall}
                       disabled={mcpLiveLoading}
-                      className="h-7 text-[10px] px-2.5 font-sans"
+                      className="h-7 text-xs font-medium"
                     >
                       {mcpLiveLoading ? (
                         <>
-                          <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                          <span>Calling /api/mcp...</span>
+                          <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                          <span>Testing...</span>
                         </>
                       ) : (
                         <>
-                          <Play className="w-3 h-3 fill-current mr-1" />
-                          <span>Execute Live Tool Call: paypal_check_purchase_policy</span>
+                          <Play className="w-3 h-3 fill-current mr-1.5" />
+                          <span>Test Live Policy Check</span>
                         </>
                       )}
                     </Button>
                   </div>
 
                   {mcpLiveOutput ? (
-                    <div className="space-y-1.5 animate-in fade-in">
-                      <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                        <span>✓ Response from POST /api/mcp (HTTP {mcpLiveOutput.status})</span>
-                        <Badge variant="outline" className="text-[9px] py-0">{mcpLiveOutput.latencyMs}ms latency</Badge>
+                    <div className="space-y-1 font-mono text-[11px] animate-in fade-in">
+                      <div className="flex items-center gap-2 text-emerald-400 font-medium">
+                        <span>✓ Response from PayPal Server (HTTP {mcpLiveOutput.status})</span>
+                        <span className="text-muted-foreground text-[10px]">{mcpLiveOutput.latencyMs}ms response</span>
                       </div>
-                      <pre className="p-2.5 rounded bg-card/90 border border-emerald-500/30 overflow-x-auto text-emerald-400 max-h-[180px]">
+                      <pre className="p-2.5 rounded bg-card border border-border/80 overflow-x-auto text-foreground max-h-[160px]">
 {JSON.stringify(mcpLiveOutput.payload, null, 2)}
                       </pre>
                     </div>
                   ) : (
-                    <div>
-                      <p className="text-muted-foreground mb-2">Click the button above to execute a real JSON-RPC 2.0 tool call to the live Next.js MCP server at <code>/api/mcp</code>.</p>
-                      <pre className="p-2.5 rounded bg-card/80 border border-border overflow-x-auto text-foreground">
-{JSON.stringify({
-  jsonrpc: "2.0",
-  id: "sample_mcp_call",
-  method: "tools/call",
-  params: {
-    name: "paypal_check_purchase_policy",
-    arguments: {
-      vendorName: "CloudTech Supply Distro",
-      quotedAmount: 949.00,
-      budgetCap: 900.00,
-      unapprovedMarkup: 100.00
-    }
-  }
-}, null, 2)}
-                      </pre>
-                    </div>
+                    <p className="text-[11px] text-muted-foreground font-normal font-mono">
+                      Click &quot;Test Live Policy Check&quot; above to see a real-time policy audit response from our server.
+                    </p>
                   )}
                 </div>
               )}
@@ -504,54 +470,51 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* AG Grid Inspired Product Spec & Discrepancy Matrix */}
+        {/* Price Comparison Table (AG Grid) */}
         <Card className="glass">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center justify-between">
-              <span>AG Grid Multi-Vendor Spec & Discrepancy Matrix</span>
-              <Badge variant="outline">Live Benchmark</Badge>
+          <CardHeader className="p-4 pb-2">
+            <CardTitle className="text-sm font-semibold flex items-center justify-between">
+              <span>Store Price Comparison</span>
+              <span className="text-xs text-muted-foreground font-normal">Audited across sellers</span>
             </CardTitle>
-            <CardDescription className="text-xs">
-              Live line-item contract audit comparing candidate quotations and policy adherence
-            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-1">
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="border-b border-border text-muted-foreground font-semibold">
+                <thead className="border-b border-border text-muted-foreground font-medium">
                   <tr>
-                    <th className="py-2.5 px-3">Vendor / Merchant</th>
-                    <th className="py-2.5 px-3">Quoted Item</th>
-                    <th className="py-2.5 px-3">Quoted Price</th>
-                    <th className="py-2.5 px-3">Policy & Markup Audit</th>
-                    <th className="py-2.5 px-3">Agent Action</th>
+                    <th className="py-2 px-3">Seller / Store</th>
+                    <th className="py-2 px-3">Item</th>
+                    <th className="py-2 px-3">Price</th>
+                    <th className="py-2 px-3">Fee Check</th>
+                    <th className="py-2 px-3">AI Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  <tr className="bg-rose-500/5 font-medium">
-                    <td className="py-3 px-3 flex items-center gap-2">
-                      <XCircle className="w-3.5 h-3.5 text-rose-500" /> CloudTech Supply Distro
+                  <tr>
+                    <td className="py-2.5 px-3 flex items-center gap-1.5 text-foreground">
+                      <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" /> CloudTech Supply
                     </td>
-                    <td className="py-3 px-3 text-muted-foreground">Dell XPS 13 Dev Edition</td>
-                    <td className="py-3 px-3 font-mono font-bold text-rose-400">$949.00</td>
-                    <td className="py-3 px-3 text-rose-400">FAILED: +$49 over cap (+$100 rush fee)</td>
-                    <td className="py-3 px-3"><Badge variant="destructive">Rejected (Halted)</Badge></td>
+                    <td className="py-2.5 px-3 text-muted-foreground">Dell XPS 13</td>
+                    <td className="py-2.5 px-3 font-semibold text-rose-400">$949.00</td>
+                    <td className="py-2.5 px-3 text-rose-300">Over budget (+$100 rush fee)</td>
+                    <td className="py-2.5 px-3"><Badge variant="destructive" className="text-[10px]">Blocked</Badge></td>
                   </tr>
-                  <tr className="bg-emerald-500/5 font-medium">
-                    <td className="py-3 px-3 flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-500" /> Official Dell Direct (PayPal Verified)
+                  <tr className="bg-emerald-500/5">
+                    <td className="py-2.5 px-3 flex items-center gap-1.5 text-foreground font-medium">
+                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Official Dell Direct
                     </td>
-                    <td className="py-3 px-3 text-muted-foreground">Dell XPS 13 Dev Edition</td>
-                    <td className="py-3 px-3 font-mono font-bold text-emerald-400">$849.00</td>
-                    <td className="py-3 px-3 text-emerald-500">VERIFIED: 100% Rate Parity ($51 under cap)</td>
-                    <td className="py-3 px-3"><Badge variant="success">Approved & Settled</Badge></td>
+                    <td className="py-2.5 px-3 text-muted-foreground">Dell XPS 13</td>
+                    <td className="py-2.5 px-3 font-semibold text-emerald-400">$849.00</td>
+                    <td className="py-2.5 px-3 text-emerald-400">Fair price ($51 under budget)</td>
+                    <td className="py-2.5 px-3"><Badge variant="success" className="text-[10px]">Approved</Badge></td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-3">Certified Refurb Store</td>
-                    <td className="py-3 px-3 text-muted-foreground">MacBook Air M2 (Refurb)</td>
-                    <td className="py-3 px-3 font-mono">$899.00</td>
-                    <td className="py-3 px-3 text-muted-foreground">VALID: Under cap, but 90-day warranty</td>
-                    <td className="py-3 px-3"><Badge variant="outline">Alternative</Badge></td>
+                    <td className="py-2.5 px-3 text-foreground">Certified Refurb Store</td>
+                    <td className="py-2.5 px-3 text-muted-foreground">MacBook Air M2</td>
+                    <td className="py-2.5 px-3 text-muted-foreground">$899.00</td>
+                    <td className="py-2.5 px-3 text-muted-foreground">Valid price (90-day warranty)</td>
+                    <td className="py-2.5 px-3"><Badge variant="outline" className="text-[10px]">Alternative</Badge></td>
                   </tr>
                 </tbody>
               </table>
@@ -564,49 +527,43 @@ export default function DashboardPage() {
       <Dialog
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Verifiable Sponsor Integrations Matrix"
-        description="Direct line-by-line proof of official hackathon sponsors & developer infrastructure."
+        title="Developer Integrations & Sponsor Proof"
+        description="Line-by-line proof of our PayPal integration and developer tools."
       >
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground max-h-[60vh] overflow-y-auto pr-1">
-          <div className="p-2.5 rounded-lg border border-border bg-muted/40">
+          <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">💳 PayPal Developer Platform</h4>
-            <p>Orders v2 API creation, OAuth2 credentials, and autonomous payment capture.</p>
+            <p>Creates checkout orders and captures payments safely using PayPal Orders v2 API.</p>
             <code className="text-[10px] font-mono text-primary block mt-1">src/lib/payments/paypal.ts:13-92</code>
           </div>
 
-          <div className="p-2.5 rounded-lg border border-border bg-muted/40">
-            <h4 className="font-semibold text-foreground mb-0.5">📦 Channel3 Product Data API</h4>
-            <p>Real-time catalog discovery, inventory checks, and price boundary queries.</p>
-            <code className="text-[10px] font-mono text-purple-400 block mt-1">src/lib/integrations/sponsors.ts:25-67</code>
-          </div>
-
-          <div className="p-2.5 rounded-lg border border-border bg-muted/40">
+          <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">🔍 Elastic Vector Search</h4>
-            <p>Hybrid semantic search and KNN vector ranking matching natural language constraints.</p>
+            <p>Ranks products and matches user needs against store inventory.</p>
             <code className="text-[10px] font-mono text-emerald-400 block mt-1">src/lib/integrations/sponsors.ts:70-76</code>
           </div>
 
-          <div className="p-2.5 rounded-lg border border-border bg-muted/40">
-            <h4 className="font-semibold text-foreground mb-0.5">📄 APIMatic Context Engine</h4>
-            <p>OpenAPI 3.0 schema feeds preventing LLM parameter hallucination on PayPal APIs.</p>
+          <div className="p-3 rounded-lg border border-border bg-card">
+            <h4 className="font-semibold text-foreground mb-0.5">📦 Channel3 Product Catalog</h4>
+            <p>Provides real-time product pricing and stock availability.</p>
+            <code className="text-[10px] font-mono text-purple-400 block mt-1">src/lib/integrations/sponsors.ts:25-67</code>
+          </div>
+
+          <div className="p-3 rounded-lg border border-border bg-card">
+            <h4 className="font-semibold text-foreground mb-0.5">📄 APIMatic Schema Context</h4>
+            <p>Provides exact PayPal API schemas so the AI never sends invalid parameters.</p>
             <code className="text-[10px] font-mono text-blue-400 block mt-1">src/lib/integrations/sponsors.ts:79-90</code>
           </div>
 
-          <div className="p-2.5 rounded-lg border border-border bg-muted/40">
+          <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">📮 Postman API Test Suite</h4>
-            <p>Exportable Postman collection testing live PayPal Sandbox endpoints.</p>
+            <p>Exportable Postman test collection verifying live PayPal endpoints.</p>
             <code className="text-[10px] font-mono text-amber-400 block mt-1">postman/paypal-ai-collection.json</code>
-          </div>
-
-          <div className="p-2.5 rounded-lg border border-border bg-muted/40">
-            <h4 className="font-semibold text-foreground mb-0.5">☁️ Render Cloud Deployment</h4>
-            <p>Infrastructure-as-code blueprint for zero-config production deployment.</p>
-            <code className="text-[10px] font-mono text-rose-400 block mt-1">render.yaml:1-16</code>
           </div>
 
           <div className="pt-2 flex justify-end">
             <Button size="sm" onClick={() => setIsModalOpen(false)}>
-              Close Proof
+              Close
             </Button>
           </div>
         </div>

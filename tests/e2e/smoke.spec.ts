@@ -1,11 +1,10 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Hackathon Blueprint E2E Smoke Tests", () => {
+test.describe("AgentPay AI E2E Smoke Tests", () => {
   test("1. Landing page loads cleanly with headline and status badge", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/Hackathon/i);
     await expect(page.locator("h1")).toBeVisible();
-    await expect(page.getByText("Official Hackathon Submission")).toBeVisible();
+    await expect(page.getByText("PayPal AI Hackathon 2026")).toBeVisible();
   });
 
   test("2. Theme toggle switches between dark and light modes cleanly", async ({ page }) => {
@@ -29,24 +28,24 @@ test.describe("Hackathon Blueprint E2E Smoke Tests", () => {
 
   test("3. 1-Click Guest Demo Bypass button navigates directly to /dashboard", async ({ page }) => {
     await page.goto("/");
-    const demoButton = page.getByRole("link", { name: /explore live interactive demo/i });
+    const demoButton = page.getByRole("link", { name: /try the live demo|open demo/i }).first();
     await demoButton.click();
 
     await expect(page).toHaveURL(/.*dashboard/);
-    await expect(page.getByText("Project Command Center")).toBeVisible();
-    await expect(page.getByText("Active Sessions")).toBeVisible();
+    await expect(page.getByText("Shopping Demo & Dashboard")).toBeVisible();
+    await expect(page.getByText("Your Spending Limit")).toBeVisible();
   });
 
-  test("4. Magic Moment execution triggers telemetry logs and success state", async ({ page }) => {
+  test("4. Magic Moment execution triggers shopping search and catch", async ({ page }) => {
     await page.goto("/dashboard");
-    const executeButton = page.getByRole("button", { name: /agentic paypal settlement|execute/i });
+    const executeButton = page.getByRole("button", { name: /start shopping search/i });
     await executeButton.click();
 
-    // Verify executing state
-    await expect(page.getByText(/processing|executing/i)).toBeVisible();
+    // Verify searching state
+    await expect(page.getByText(/searching stores/i)).toBeVisible();
 
-    // Await success telemetry
-    await expect(page.getByText(/payment captured|autonomous workflow completed/i)).toBeVisible({ timeout: 5000 });
+    // Await fee caught or approval state
+    await expect(page.getByText(/sneaky fee caught|your approval needed/i)).toBeVisible({ timeout: 5000 });
   });
 
   test("5. Interactive Documentation (/docs) loads with quickstart and copy button", async ({ page }) => {

@@ -28,26 +28,26 @@
   }
 
   .dark {
-    /* Dark Mode - Deep Obsidian Slate (Anti-glare, eye-comfortable) */
-    --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
+    /* Soft Charcoal Slate (Comfortable, eye-friendly, premium dark mode) */
+    --background: 222 22% 11%;
+    --foreground: 210 25% 96%;
+    --card: 222 20% 16%;
+    --card-foreground: 210 25% 96%;
+    --popover: 222 20% 16%;
+    --popover-foreground: 210 25% 96%;
     --primary: 217 91% 60%;
     --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 15%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 15%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 40%;
+    --secondary: 222 18% 20%;
+    --secondary-foreground: 210 25% 96%;
+    --muted: 222 18% 20%;
+    --muted-foreground: 215 16% 70%;
+    --accent: 222 18% 22%;
+    --accent-foreground: 210 25% 96%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 224 76% 48%;
+    --border: 222 16% 23%;
+    --input: 222 16% 23%;
+    --ring: 217 91% 60%;
   }
 }
 
