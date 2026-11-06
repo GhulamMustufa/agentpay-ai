@@ -145,7 +145,7 @@ export default function LandingPage() {
                   <Layers className="w-4 h-4 text-primary" /> The 3-Step Shopping Process
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  You give the AI a goal and budget cap. The AI searches verified stores using Elastic vector search, reviews the quote for hidden surcharges, and prompts you for 1-click approval before settling via PayPal Orders v2.
+                  You tell the AI what you want and set your spending limit. The AI searches verified stores, checks quotes for any hidden surcharges or fees, and asks for your 1-click approval before paying safely with PayPal.
                 </p>
               </Card>
             </TabsContent>
@@ -167,7 +167,7 @@ export default function LandingPage() {
                   <CheckCircle className="w-4 h-4 text-purple-400" /> Fully Tested
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Includes 9 automated unit tests verifying payment safety, along with an exportable Postman collection to test the PayPal API integration.
+                  Includes 21 automated safety checks and tests that verify payment safety, budget limits, and live PayPal API connections.
                 </p>
               </Card>
             </TabsContent>

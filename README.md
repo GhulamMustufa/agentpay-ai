@@ -4,7 +4,7 @@
 
 [![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-blue)](http://localhost:3000)
 [![PayPal Integration](https://img.shields.io/badge/PayPal-Orders%20v2-emerald)](./SPONSORS.md)
-[![Tests](https://img.shields.io/badge/Tests-9%20Passing-purple)](./tests)
+[![Tests](https://img.shields.io/badge/Tests-21%20Passing-purple)](./src/lib/__tests__)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ---
@@ -56,21 +56,23 @@ npm run dev
 ## 🧪 Automated Tests
 
 ```bash
-# Run unit tests (All 9 tests pass in < 500ms)
+# Run unit tests (All 21 tests pass in < 700ms)
 npm test
 
-# Run browser smoke tests
-npm run test:e2e
+# Run live edge-case suite (Real PayPal Sandbox & Gemini tests)
+npm run test:edge
 ```
 
 ---
 
 ## 🛠️ How It's Built
 
-- **Frontend:** Next.js 15, React 19, Tailwind CSS (Comfortable Soft Charcoal Dark & Soft Light themes).
-- **Payment Engine:** PayPal Developer Platform (Orders v2 API & OAuth2).
-- **Product Search:** Elastic vector search & Channel3 catalog adapter.
+- **Frontend & UI:** Next.js 15, React 19, Tailwind CSS (Comfortable Soft Charcoal Dark & Soft Light themes).
+- **Payment Engine:** PayPal Developer Platform (Orders v2 API `/v2/checkout/orders` with automated capture).
+- **AI Sourcing:** Google Gemini 3.5 Flash neural extraction via direct REST v1beta.
+- **3-Agent Helpers:** Store Searcher (catalog & specs), Fee Inspector (guardrail policy), Safe Checkout (PayPal capture).
 - **Safety Protocol:** Model Context Protocol (MCP) server running at `/api/mcp`.
+- **Audit Ledger:** Persistent local ledger tracking purchases and money saved from markups.
 - **API Tests:** Ready-to-import Postman test collection in `postman/paypal-ai-collection.json`.
 
 ---

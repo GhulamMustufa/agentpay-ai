@@ -47,27 +47,27 @@ export function evaluateQuoteAgainstPolicy(
   // Rule 1: Strict Budget Cap
   if (quote.price > budgetCap) {
     violations.push(
-      `Quoted price ($${quote.price.toFixed(2)}) exceeds your max budget limit of $${budgetCap.toFixed(2)} by $${(quote.price - budgetCap).toFixed(2)}.`
+      `$${(quote.price - budgetCap).toFixed(0)} over your budget`
     );
   }
 
   // Rule 2: Unapproved Markup Tolerance
   if (quote.markup > policy.maxMarkupTolerance) {
     violations.push(
-      `Detected unapproved surcharge ($${quote.markup.toFixed(2)}: ${quote.markupReason || "Hidden fee"}) exceeding your $${policy.maxMarkupTolerance.toFixed(2)} tolerance.`
+      `$${quote.markup.toFixed(0)} hidden fee (${quote.markupReason || "markup"})`
     );
   }
 
   // Rule 3: Merchant Verification
   const isVerified = quote.vendor.toLowerCase().includes("verified") || quote.vendor.toLowerCase().includes("official");
   if (policy.requireVerifiedMerchants && !isVerified && !quote.isCompliant) {
-    violations.push(`Merchant "${quote.vendor}" is not PayPal Verified.`);
+    violations.push("Not PayPal-verified");
   }
 
   // Rule 4: Refurbished Policy
   const isRefurb = quote.item.toLowerCase().includes("refurb") || quote.vendor.toLowerCase().includes("refurb");
   if (!policy.allowRefurbished && isRefurb) {
-    violations.push(`Refurbished items are disallowed under your current condition policy.`);
+    violations.push("Refurbished item (blocked by rule)");
   }
 
   const isCompliant = violations.length === 0;
@@ -82,9 +82,9 @@ export function evaluateQuoteAgainstPolicy(
     requiresHumanApproval,
     reason: isCompliant
       ? quote.price <= policy.autoApproveThreshold
-        ? "Within budget and below auto-approve threshold. Safe to settle automatically."
-        : `Within budget ($${(budgetCap - quote.price).toFixed(2)} under cap). Requires 1-click confirmation (over $${policy.autoApproveThreshold.toFixed(2)}).`
-      : violations.join(" "),
+        ? "Within budget and safe to auto-approve."
+        : `Within budget ($${(budgetCap - quote.price).toFixed(2)} under limit). Awaiting 1-click approval.`
+      : violations.join(", "),
   };
 }
 

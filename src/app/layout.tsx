@@ -4,8 +4,8 @@ import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Hackathon MVP - Production-Grade Foundation",
-  description: "Dual-theme, skimmable typography, sub-50ms latency, zero-friction interactive demo.",
+  title: "AgentPay AI - Safe AI Shopping with PayPal",
+  description: "Smart AI shopping assistant that searches stores, stops hidden fees, and requires your 1-click confirmation before paying safely with PayPal.",
 };
 
 export default function RootLayout({

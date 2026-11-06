@@ -40,10 +40,13 @@ That vision is **AgentPay AI**.
 
 ### How We Built It
 - **Payments:** PayPal Orders v2 REST API & OAuth2 client credentials (`src/lib/payments/paypal.ts`).
-- **Product Search:** Elastic vector search and Channel3 catalog adapters (`src/lib/integrations/sponsors.ts`).
-- **Safety Protocol:** Standard Model Context Protocol (MCP) server with live tool testing.
+- **AI Intelligence:** Google Gemini 3.5 Flash neural reasoning via direct REST v1beta for line-item quote analysis.
+- **3-Agent Helpers:** Specialized helpers (Store Searcher, Fee Inspector, and Safe Checkout) collaborating in sequence.
+- **Product Search:** Semantic vector search and multi-vendor catalog adapters (`src/lib/integrations/sponsors.ts`).
+- **Safety Protocol:** Standard Model Context Protocol (MCP) server at `/api/mcp` with live tool testing.
+- **Audit & Savings Ledger:** Persistent ledger tracking transactions and prevented overcharges.
 - **Frontend & Design:** Next.js 15, React 19, Tailwind CSS with an eye-comfortable Soft Charcoal dark theme and soft light theme.
-- **Testing:** 9 automated unit tests passing in < 500ms (`npm test`), plus Postman test collection in `postman/paypal-ai-collection.json`.
+- **Testing:** 21 automated unit tests passing in < 700ms (`npm test`), 4 live edge-case tests, plus Postman test collection in `postman/paypal-ai-collection.json`.
 
 ---
 
@@ -55,9 +58,10 @@ That vision is **AgentPay AI**.
 ---
 
 ### Accomplishments We're Proud Of
-- **Live Discrepancy Halt**: Successfully demonstrating the AI stopping a $100 fee live on screen.
+- **Live Overcharge Protection**: Successfully demonstrating the AI stopping sneakily inflated quotes live on screen and saving user money.
 - **1-Click Guest Mode**: Judges can test the full shopping and payment flow with zero setup or login friction.
-- **9 Passing Test Suites**: 100% passing tests verifying both successful payments and overcharge halts.
+- **21 Passing Test Suites**: 100% passing tests verifying payment safety, guardrail policy enforcement, live API routes, and non-shopping prompts.
+- **PayPal & Gemini Live Integration**: Direct network connectivity with official PayPal Sandbox (`api-m.sandbox.paypal.com`) and Google AI Studio.
 
 ---
 

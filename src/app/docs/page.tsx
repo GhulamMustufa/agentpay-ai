@@ -196,10 +196,10 @@ npm run dev
               {/* Running Tests Card */}
               <div className="p-4 rounded-xl border border-border bg-muted/40 space-y-2">
                 <h4 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Automated Tests (18/18 Passing)
+                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Automated Tests (21/21 Passing)
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed font-normal">
-                  Run <code>npm test</code> to execute all 18 automated unit and route integration tests covering payment safety, overcharge detection, live API routes, non-shopping queries, and Model Context Protocol (MCP) tool execution.
+                  Run <code>npm test</code> to execute all 21 automated safety checks and tests covering payment protection, stopping hidden fees, live API connections, non-shopping questions, and tool safety.
                 </p>
               </div>
             </div>
@@ -229,9 +229,9 @@ npm run dev
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
                   <div className="w-6 h-6 rounded-md bg-purple-500/10 text-purple-400 font-bold flex items-center justify-center text-xs">2</div>
-                  <h3 className="font-semibold text-foreground text-sm">AI Compares Real Stores & Line Items</h3>
+                  <h3 className="font-semibold text-foreground text-sm">AI Compares Real Stores & Prices</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    The AI searches verified stores using Elastic vector search, checking specs, stock, and seller ratings.
+                    The AI searches verified stores, comparing exact specifications, stock levels, and customer ratings.
                   </p>
                 </div>
 
@@ -278,7 +278,7 @@ npm run dev
                       <tr>
                         <td className="py-2 pr-3 font-medium text-foreground">Payment Execution</td>
                         <td className="py-2 px-3">Manual redirect</td>
-                        <td className="py-2 pl-3 text-emerald-400">PayPal Orders v2 with 1-click approval</td>
+                        <td className="py-2 pl-3 text-emerald-400">Safe PayPal checkout with your 1-click confirmation</td>
                       </tr>
                     </tbody>
                   </table>
@@ -314,7 +314,7 @@ npm run dev
                 <div className="p-3.5 rounded-lg border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <code className="text-primary font-semibold text-xs">paypal_search_catalog</code>
-                    <p className="text-muted-foreground text-[11px] mt-0.5">Searches verified stores for products matching user needs and budget constraints.</p>
+                    <p className="text-muted-foreground text-[11px] mt-0.5">Searches trusted stores for products that fit what you need and stay under your budget limit.</p>
                   </div>
                   <Badge variant="outline" className="text-[10px] shrink-0">Search</Badge>
                 </div>
@@ -322,15 +322,15 @@ npm run dev
                 <div className="p-3.5 rounded-lg border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <code className="text-rose-400 font-semibold text-xs">paypal_check_purchase_policy</code>
-                    <p className="text-muted-foreground text-[11px] mt-0.5">Audits store quotes. Detects unauthorized fees and halts if budget limit is exceeded.</p>
+                    <p className="text-muted-foreground text-[11px] mt-0.5">Checks store quotes for sneaky markups and halts immediately if your spending limit is crossed.</p>
                   </div>
-                  <Badge variant="destructive" className="text-[10px] shrink-0">Guardrail</Badge>
+                  <Badge variant="destructive" className="text-[10px] shrink-0">Safety Check</Badge>
                 </div>
 
                 <div className="p-3.5 rounded-lg border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <code className="text-blue-400 font-semibold text-xs">paypal_create_order</code>
-                    <p className="text-muted-foreground text-[11px] mt-0.5">Prepares a PayPal Orders v2 transaction with strict schema validation.</p>
+                    <p className="text-muted-foreground text-[11px] mt-0.5">Prepares the safe order with PayPal with exact pricing and seller details.</p>
                   </div>
                   <Badge variant="sponsor" className="text-[10px] shrink-0">Checkout</Badge>
                 </div>
@@ -338,9 +338,9 @@ npm run dev
                 <div className="p-3.5 rounded-lg border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <code className="text-emerald-400 font-semibold text-xs">paypal_capture_order</code>
-                    <p className="text-muted-foreground text-[11px] mt-0.5">Captures payment only when a signed human approval token is provided.</p>
+                    <p className="text-muted-foreground text-[11px] mt-0.5">Finishes the payment safely only after you click your 1-click approval button.</p>
                   </div>
-                  <Badge variant="success" className="text-[10px] shrink-0">Settlement</Badge>
+                  <Badge variant="success" className="text-[10px] shrink-0">Payment</Badge>
                 </div>
               </div>
 
@@ -389,7 +389,7 @@ npm run dev
                     <Badge variant="success" className="text-[10px]">Primary Core</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Direct integration with PayPal Orders v2 REST API (`/v2/checkout/orders`) with OAuth2 client credentials and automated capture.
+                    Direct connection with official PayPal Orders API to create and complete payments safely in seconds.
                   </p>
                   <code className="text-[10px] text-primary block mt-1 font-mono">File: src/lib/payments/paypal.ts:13-92</code>
                 </div>
@@ -402,7 +402,7 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">Search Engine</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Ranks products and matches user needs against store inventory using semantic search.
+                    Finds the best matching products from store catalogs by comparing specifications, features, and budget.
                   </p>
                   <code className="text-[10px] text-emerald-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:70-76</code>
                 </div>
@@ -415,7 +415,7 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">Catalog API</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Provides multi-store product data, live price comparisons, and stock verification.
+                    Gathers multi-store prices, specifications, and live stock availability.
                   </p>
                   <code className="text-[10px] text-purple-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:25-67</code>
                 </div>
@@ -428,7 +428,7 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">API Schemas</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Feeds strictly typed OpenAPI 3.0 contracts to the AI so it never makes invalid parameter calls.
+                    Gives the AI clear rules and strict blueprints so it never makes formatting mistakes or invalid payment requests.
                   </p>
                   <code className="text-[10px] text-blue-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:79-90</code>
                 </div>
@@ -441,7 +441,7 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">Data Grid</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Powers the multi-store price and spec comparison table on the dashboard.
+                    Clean, easy-to-read comparison table on your dashboard showing prices, shipping fees, and store ratings.
                   </p>
                   <code className="text-[10px] text-foreground block mt-1 font-mono">File: src/app/dashboard/page.tsx:320-370</code>
                 </div>
@@ -454,7 +454,7 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">Progress</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Drives the 4-stage visual progress tracker on the dashboard.
+                    Visual step-by-step progress tracker that shows you what the AI is doing in real time.
                   </p>
                   <code className="text-[10px] text-foreground block mt-1 font-mono">File: src/app/dashboard/page.tsx:210-230</code>
                 </div>
@@ -467,7 +467,7 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">API Testing</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Includes a ready-to-import Postman test collection verifying live PayPal endpoints.
+                    Ready-to-use testing file to verify all PayPal payment steps with 1 click.
                   </p>
                   <code className="text-[10px] text-amber-400 block mt-1 font-mono">File: postman/paypal-ai-collection.json</code>
                 </div>
@@ -480,7 +480,7 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">Deployment</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Infrastructure-as-code configuration for 1-click zero-downtime deployment.
+                    Cloud deployment file to launch this app online in minutes with 1 click.
                   </p>
                   <code className="text-[10px] text-rose-400 block mt-1 font-mono">File: render.yaml:1-16</code>
                 </div>

@@ -30,7 +30,7 @@ export class PolicyAuditorAgent {
     let violatingQuote: (ShoppingQuote & { policyDetails?: PolicyEvaluationResult }) | null = null;
     let approvedQuote: (ShoppingQuote & { policyDetails?: PolicyEvaluationResult }) | null = null;
 
-    auditLogs.push(`Auditor Agent: Initializing compliance check against user policy (Max Surcharge: $${policy.maxMarkupTolerance.toFixed(2)}, Cap: $${budgetCap.toFixed(2)})...`);
+    auditLogs.push(`🛡️ Fee Inspector: Checking store quotes against your rules (Max fee allowed: $${policy.maxMarkupTolerance.toFixed(2)}, Budget: $${budgetCap.toFixed(2)})...`);
 
     for (const q of quotes) {
       const evaluation = evaluateQuoteAgainstPolicy(q, budgetCap, policy);
@@ -38,12 +38,12 @@ export class PolicyAuditorAgent {
       if (!evaluation.isCompliant && !violatingQuote) {
         violatingQuote = { ...q, policyDetails: evaluation };
         auditLogs.push(
-          `⚠️ VIOLATION DETECTED from "${q.vendor}": ${evaluation.reason}`
+          `⚠️ Sneaky Fee Caught from "${q.vendor}": ${evaluation.reason}`
         );
       } else if (evaluation.isCompliant && !approvedQuote) {
         approvedQuote = { ...q, policyDetails: evaluation };
         auditLogs.push(
-          `✓ COMPLIANT QUOTE from "${q.vendor}": $${q.price.toFixed(2)} (meets all policy standards).`
+          `✓ Fair Price Verified from "${q.vendor}": $${q.price.toFixed(2)} (meets all your safety rules).`
         );
       }
     }
@@ -63,18 +63,18 @@ export class PolicyAuditorAgent {
 
     if (violatingQuote) {
       auditLogs.push(
-        `🛡️ DISCREPANCY HALT: Rejected ${violatingQuote.vendor} ($${violatingQuote.price.toFixed(2)}). Prevented $${moneySaved.toFixed(2)} overcharge.`
+        `🛡️ Stopped Overcharge: Rejected ${violatingQuote.vendor} ($${violatingQuote.price.toFixed(2)}). Saved you $${moneySaved.toFixed(2)}!`
       );
     }
 
     if (approvedQuote) {
       if (requiresHumanApproval) {
         auditLogs.push(
-          `✋ HUMAN-IN-THE-LOOP GATE: ${approvedQuote.vendor} ($${approvedQuote.price.toFixed(2)}) exceeds auto-approve threshold ($${policy.autoApproveThreshold.toFixed(2)}). Awaiting 1-click confirmation.`
+          `✋ Ready for Approval: ${approvedQuote.vendor} ($${approvedQuote.price.toFixed(2)}) is over your $${policy.autoApproveThreshold.toFixed(2)} rule. Waiting for your 1-click confirmation.`
         );
       } else {
         auditLogs.push(
-          `⚡ AUTO-APPROVE POLICY MET: ${approvedQuote.vendor} ($${approvedQuote.price.toFixed(2)}) is within $${policy.autoApproveThreshold.toFixed(2)} auto-approve threshold.`
+          `⚡ Safe to Auto-Pay: ${approvedQuote.vendor} ($${approvedQuote.price.toFixed(2)}) is under your $${policy.autoApproveThreshold.toFixed(2)} rule.`
         );
       }
     }

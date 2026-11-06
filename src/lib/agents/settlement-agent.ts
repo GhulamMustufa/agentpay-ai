@@ -87,8 +87,8 @@ export class PayPalSettlementAgent {
       receiptUrl: approvalUrl,
       agentAuditTrail: [
         ...params.auditLogs,
-        `Settlement Agent: Created PayPal Order #${orderId} on ${isLive ? "api-m.sandbox.paypal.com" : "Zero-Config Sandbox"}.`,
-        `Settlement Agent: Captured order successfully in ${latencyMs}ms. Status: ${captureStatus}.`,
+        `💳 Safe Checkout: Created PayPal Order #${orderId} on ${isLive ? "api-m.sandbox.paypal.com" : "PayPal Sandbox"}.`,
+        `💳 Safe Checkout: Payment confirmed successfully via PayPal in ${latencyMs}ms. Status: ${captureStatus}.`,
       ],
     });
 

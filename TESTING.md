@@ -50,13 +50,14 @@ Runs tests across payment gateway logic, policy checks, and MCP server endpoints
 ```bash
 npm test
 ```
-*Expected Result: 9/9 passing tests in < 500ms.*
+*Expected Result: 21/21 passing tests in < 700ms.*
 
-### 2. Playwright E2E Smoke Tests
-Runs end-to-end browser tests verifying UI responsiveness, navigation, and theme toggling:
+### 2. Live API Edge-Case Tests
+Runs live tests against real PayPal Sandbox and Google Gemini endpoints verifying non-shopping queries, unrealistic low budgets, prompt injection resistance, and order lifecycles:
 ```bash
-npm run test:e2e
+npm run test:edge
 ```
+*Expected Result: 4/4 passing tests.*
 
 ### 3. Postman API Test Suite
 Import `postman/paypal-ai-collection.json` into Postman to execute live calls against PayPal Sandbox OAuth2 and Orders v2 endpoints.

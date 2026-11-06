@@ -42,13 +42,13 @@ async function handleEdgeTests(req: NextRequest) {
 
     results.push({
       id: "edge_01_non_shopping",
-      name: "Non-Shopping Query Rejection",
+      name: "Handles Non-Shopping Questions",
       category: "AI Reasoning",
       passed,
       durationMs: dur,
       expected: "isShopping: false (halts commercial purchase)",
       actual: `isShopping: ${data.analysis?.isShopping}`,
-      details: data.analysis?.feedbackMessage || "Rejection feedback returned.",
+      details: data.analysis?.feedbackMessage || "Politely notifies user this is not a shopping request.",
     });
   } catch (err: any) {
     results.push({
@@ -80,18 +80,18 @@ async function handleEdgeTests(req: NextRequest) {
 
     results.push({
       id: "edge_02_unrealistic_budget",
-      name: "Absurd Low Budget Detection ($15 Laptop)",
+      name: "Catches Unrealistic Budget ($15 Laptop)",
       category: "Guardrail Policy",
       passed,
       durationMs: dur,
       expected: "isUnrealistic: true (halts transaction)",
       actual: `isUnrealistic: ${data.analysis?.isUnrealistic}`,
-      details: data.analysis?.feedbackMessage || "Market minimum warning given.",
+      details: data.analysis?.feedbackMessage || "Warns user that the budget is too low for this item.",
     });
   } catch (err: any) {
     results.push({
       id: "edge_02_unrealistic_budget",
-      name: "Absurd Low Budget Detection ($15 Laptop)",
+      name: "Catches Unrealistic Budget ($15 Laptop)",
       category: "Guardrail Policy",
       passed: false,
       durationMs: 0,
@@ -119,18 +119,18 @@ async function handleEdgeTests(req: NextRequest) {
 
     results.push({
       id: "edge_03_prompt_injection",
-      name: "Adversarial Prompt Injection Defense",
+      name: "Blocks Sneaky Prompt Tricks & Hacks",
       category: "AI Reasoning",
       passed,
       durationMs: dur,
       expected: "Prompt override neutralized; budget cap strictly enforced",
       actual: data.analysis?.isShopping ? `Enforced Cap: $${data.analysis?.budgetCap}` : "Rejected as non-shopping",
-      details: "AI guardrail prevented arbitrary financial override.",
+      details: "Safety rules prevented any unauthorized spending.",
     });
   } catch (err: any) {
     results.push({
       id: "edge_03_prompt_injection",
-      name: "Adversarial Prompt Injection Defense",
+      name: "Blocks Sneaky Prompt Tricks & Hacks",
       category: "AI Reasoning",
       passed: false,
       durationMs: 0,
@@ -155,20 +155,20 @@ async function handleEdgeTests(req: NextRequest) {
 
     results.push({
       id: "edge_04_paypal_order_lifecycle",
-      name: "PayPal Orders v2 Creation & Token Lifecycle",
+      name: "Tests Live PayPal Sandbox Connection",
       category: "PayPal Security",
       passed,
       durationMs: dur,
       expected: "Order ID returned with 'created' status",
       actual: `Order #${order.id} (Status: ${order.status}, Mode: ${isLive ? "Live Sandbox" : "Zero-Config"})`,
       details: isLive
-        ? "Successfully authenticated with api-m.sandbox.paypal.com and received approval link."
+        ? "Connected to official PayPal Sandbox server and created test order."
         : "Simulated sandbox gateway validated order structure.",
     });
   } catch (err: any) {
     results.push({
       id: "edge_04_paypal_order_lifecycle",
-      name: "PayPal Orders v2 Creation & Token Lifecycle",
+      name: "Tests Live PayPal Sandbox Connection",
       category: "PayPal Security",
       passed: false,
       durationMs: 0,
