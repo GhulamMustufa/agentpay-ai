@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentPay AI - Pitch Deck | PayPal AI Hackathon 2026</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b1120;
+      color: #f8fafc;
+      overflow: hidden;
+      user-select: none;
+    }
+    
+    .slide {
+      display: none;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .glow-paypal {
+      box-shadow: 0 0 50px -10px rgba(0, 112, 186, 0.35);
+    }
+
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .badge-paypal {
+      background: linear-gradient(135deg, #0070BA 0%, #003087 100%);
+    }
+
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between p-6 md:p-10 bg-slate-950 text-slate-100 antialiased">
+
+  <!-- TOP HEADER / PROGRESS -->
+  <header class="w-full flex items-center justify-between z-20">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl badge-paypal flex items-center justify-center font-bold text-white shadow-lg text-lg">
+        P
+      </div>
+      <div>
+        <div class="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+          AgentPay AI
+          <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 font-medium">PayPal AI 2026</span>
+        </div>
+        <div class="text-xs text-slate-400">Autonomous Financial Firewall for AI</div>
+      </div>
+    </div>
+
+    <!-- Progress Indicator Bar -->
+    <div class="hidden sm:flex items-center space-x-3">
+      <div class="w-48 h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+        <div id="progressBar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-300 w-1/7"></div>
+      </div>
+      <span id="slideCounter" class="text-xs font-mono-code text-slate-400">1 / 7</span>
+    </div>
+
+    <!-- Keyboard Hint / Controls -->
+    <div class="flex items-center space-x-2">
+      <span class="hidden md:inline-block text-xs text-slate-400 font-mono-code bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-md">
+        Use &larr; &rarr; keys
+      </span>
+      <button onclick="toggleFullscreen()" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0 0l-5-5m-6 16H4m0 0v-4m0 4l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- SLIDES CONTAINER -->
+  <main class="flex-1 flex items-center justify-center relative w-full max-w-6xl mx-auto my-4 overflow-hidden">
+
+    <!-- SLIDE 1: COVER -->
+    <section class="slide active flex-col items-center text-center max-w-3xl px-4" data-index="1">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-6">
+        <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+        The Safe Payment Layer for the Agent Economy
+      </div>
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight mb-6">
+        AI Agents are spending money.<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-cyan-400">
+          We keep them on a tight leash.
+        </span>
+      </h1>
+      <p class="text-base md:text-xl text-slate-300 mb-8 max-w-2xl leading-relaxed">
+        AgentPay AI is a smart firewall between autonomous AI agents and PayPal. 
+        It prevents accidental over-spending, stops rogue purchases, and generates single-use cards automatically.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-mono-code text-slate-400">
+        <span class="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
+          <span class="text-emerald-400">✓</span> Hard Budget Caps
+        </span>
+        <span class="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
+          <span class="text-emerald-400">✓</span> Single-Use Virtual Cards
+        </span>
+        <span class="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
+          <span class="text-emerald-400">✓</span> Instant Human Kill-Switch
+        </span>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <section class="slide flex-col max-w-5xl w-full px-4" data-index="2">
+      <div class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">The Real Problem</div>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Giving an AI your credit card is terrifying.</h2>
+      <p class="text-slate-300 text-sm md:text-base mb-8 max-w-3xl">
+        Autonomous agents are now coding, booking servers, and buying tools on their own. But today's payment cards have zero built-in rules for software.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-2xl border-red-500/20 bg-red-950/10">
+          <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-xl mb-4 font-bold">
+            💸
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Runaway Loops</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            An AI stuck in a loop can call expensive cloud APIs thousands of times, racking up thousands of dollars before anyone notices.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-amber-500/20 bg-amber-950/10">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-4 font-bold">
+            🔑
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Leaked Card Details</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Storing a real company credit card in an AI prompt or env file means one prompt injection attack exposes the entire line of credit.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-blue-500/20 bg-blue-950/10">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl mb-4 font-bold">
+            🚫
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">Zero Granular Rules</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Existing corporate cards are all-or-nothing. You can't say: <em>"Only buy from GitHub, max $20 per purchase, max $100 per week."</em>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: THE SOLUTION -->
+    <section class="slide flex-col max-w-5xl w-full px-4" data-index="3">
+      <div class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">The Solution</div>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Meet AgentPay AI: The Safety Shield.</h2>
+      <p class="text-slate-300 text-sm md:text-base mb-8 max-w-3xl">
+        A lightweight proxy that inspects every purchase request before money ever leaves your PayPal account.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-2xl border-blue-500/30">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl mb-4 font-bold">
+            🛡️
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">1. Strict Spending Rules</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Set exact limits per agent. If an agent tries to buy something 1 cent above its daily cap, the request is instantly blocked.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-cyan-500/30">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl mb-4 font-bold">
+            💳
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">2. Single-Use Cards</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            The AI never sees your real card. AgentPay issues a virtual card locked to that exact merchant and amount, which expires immediately.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-indigo-500/30">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl mb-4 font-bold">
+            🚨
+          </div>
+          <h3 class="text-lg font-semibold text-white mb-2">3. Anomaly Detection</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            AI checks the purchase context. Unapproved stores, price hikes, or duplicate orders trigger an emergency pause for human approval.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: HOW IT WORKS IN 3 STEPS -->
+    <section class="slide flex-col max-w-5xl w-full px-4" data-index="4">
+      <div class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">Simple Workflow</div>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">How it works in 3 clear steps</h2>
+      <p class="text-slate-300 text-sm md:text-base mb-8 max-w-3xl">
+        Seamless for the AI, completely secure for the business owner.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+        <div class="glass-card p-6 rounded-2xl relative border-slate-700">
+          <div class="text-3xl font-extrabold text-blue-500/40 mb-2 font-mono-code">01</div>
+          <h3 class="text-lg font-semibold text-white mb-2">AI Wants to Buy</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Your coding agent finishes a task and needs to pay $12 for a domain on Namecheap or $25 for an API subscription.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl relative border-blue-500/40 bg-blue-950/20">
+          <div class="text-3xl font-extrabold text-blue-400 mb-2 font-mono-code">02</div>
+          <h3 class="text-lg font-semibold text-white mb-2">AgentPay Checks Rules</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            In 150 milliseconds: checks budget balance, verifies merchant whitelist, and scans for abnormal price surges.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl relative border-slate-700">
+          <div class="text-3xl font-extrabold text-cyan-500/40 mb-2 font-mono-code">03</div>
+          <h3 class="text-lg font-semibold text-white mb-2">PayPal Checkout</h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            If approved, a 1-time virtual card executes via PayPal Sandbox. Full receipt logged to your dashboard.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono-code text-slate-300">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <span>Zero changes required to existing merchant checkouts.</span>
+        </div>
+        <span class="text-blue-400 font-bold">Standard PayPal Payment Rails</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: LIVE INTERACTIVE TESTER -->
+    <section class="slide flex-col max-w-4xl w-full px-4" data-index="5">
+      <div class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">Interactive Proof</div>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Test the Policy Firewall Right Now</h2>
+      <p class="text-slate-300 text-sm mb-6">
+        Click below to simulate how AgentPay reacts to normal vs rogue AI behavior in real time:
+      </p>
+
+      <div class="glass-card p-6 rounded-2xl border-slate-700">
+        <div class="flex flex-wrap gap-3 mb-6">
+          <button onclick="simulateAction('normal')" id="btnNormal" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm transition flex items-center gap-2 shadow-lg">
+            <span>✅</span> Test Normal Purchase ($15.00)
+          </button>
+          <button onclick="simulateAction('rogue')" id="btnRogue" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-red-900/60 text-slate-200 border border-slate-700 hover:border-red-500 font-medium text-xs sm:text-sm transition flex items-center gap-2">
+            <span>🛑</span> Test Rogue Overcharge ($450.00)
+          </button>
+          <button onclick="simulateAction('unapproved')" id="btnUnapproved" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-amber-900/60 text-slate-200 border border-slate-700 hover:border-amber-500 font-medium text-xs sm:text-sm transition flex items-center gap-2">
+            <span>⚠️</span> Test Unapproved Store (Crypto Casino)
+          </button>
+        </div>
+
+        <!-- Simulation Screen Output -->
+        <div class="p-5 rounded-xl bg-slate-950 border border-slate-800 font-mono-code text-xs space-y-2">
+          <div class="flex items-center justify-between text-slate-400 border-b border-slate-800 pb-2">
+            <span>AGENT: Autonomous-Coder-01</span>
+            <span>BUDGET: $50.00 Max</span>
+          </div>
+          <div id="simLog" class="text-slate-300 py-2 leading-relaxed">
+            <span class="text-slate-400">// Select a test button above to see the firewall in action...</span>
+          </div>
+          <div id="simStatus" class="pt-2 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-slate-400">STATUS:</span>
+            <span id="simBadge" class="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-400 font-bold">READY</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: BUSINESS VALUE / WHY PAYPAL WINS -->
+    <section class="slide flex-col max-w-5xl w-full px-4" data-index="6">
+      <div class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">Why PayPal Wins</div>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">The Default Wallet for Millions of AI Agents</h2>
+      <p class="text-slate-300 text-sm md:text-base mb-8 max-w-3xl">
+        By 2027, hundreds of millions of autonomous tasks will be executed by AI. 
+        AgentPay turns PayPal into the most trusted payment gateway for autonomous commerce.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-2xl border-slate-700">
+          <div class="text-2xl font-bold text-blue-400 mb-2">New Payment Volume</div>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Micro-transactions, API billing, domain registrations, and autonomous procurement all routed through PayPal checkout rails.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-slate-700">
+          <div class="text-2xl font-bold text-cyan-400 mb-2">Zero Merchant Friction</div>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Stores don't have to rewrite their websites. The virtual card matches standard PayPal / Mastercard protocols everywhere online.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-slate-700">
+          <div class="text-2xl font-bold text-emerald-400 mb-2">Enterprise Peace of Mind</div>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            CFOs and managers will finally give AI agents permission to purchase things, because spending is strictly capped and monitored.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: CONCLUSION & SUMMARY -->
+    <section class="slide flex-col items-center text-center max-w-3xl px-4" data-index="7">
+      <div class="w-14 h-14 rounded-2xl badge-paypal flex items-center justify-center font-bold text-white text-2xl shadow-xl mb-6">
+        ✓
+      </div>
+      <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-4">Fully Built & Tested.</h2>
+      <p class="text-base md:text-lg text-slate-300 mb-8 max-w-xl">
+        We built the full dashboard, policy enforcement engine, and PayPal integration with 21 passing automated tests.
+      </p>
+
+      <div class="w-full glass-card p-5 rounded-2xl border-slate-700 mb-8 text-left space-y-3 font-mono-code text-xs">
+        <div class="flex justify-between items-center text-slate-300">
+          <span>✓ Next.js 14 Production Dashboard</span>
+          <span class="text-emerald-400 font-bold">ONLINE (:3000)</span>
+        </div>
+        <div class="flex justify-between items-center text-slate-300">
+          <span>✓ Automated Test Suite</span>
+          <span class="text-emerald-400 font-bold">21 / 21 PASSING</span>
+        </div>
+        <div class="flex justify-between items-center text-slate-300">
+          <span>✓ Policy Engine & Anomaly Detection</span>
+          <span class="text-blue-400 font-bold">ACTIVE</span>
+        </div>
+        <div class="flex justify-between items-center text-slate-300">
+          <span>✓ PayPal Sandbox API Integration</span>
+          <span class="text-cyan-400 font-bold">READY</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="http://localhost:3000" target="_blank" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition shadow-lg shadow-blue-600/30">
+          Open Live App (:3000)
+        </a>
+        <button onclick="goToSlide(1)" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-sm transition">
+          Restart Presentation ↺
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM CONTROLS / NAV -->
+  <footer class="w-full flex items-center justify-between z-20 pt-4 border-t border-slate-800/60 max-w-6xl mx-auto">
+    <button onclick="prevSlide()" id="prevBtn" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition disabled:opacity-30 disabled:pointer-events-none">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Previous
+    </button>
+
+    <!-- Slide Dot Selector -->
+    <div id="dotContainer" class="flex items-center space-x-2">
+      <!-- Generated by JS -->
+    </div>
+
+    <button onclick="nextSlide()" id="nextBtn" class="flex items-center gap-2 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition shadow-lg shadow-blue-600/20 disabled:opacity-30 disabled:pointer-events-none">
+      Next
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </footer>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 1;
+
+    const progressBar = document.getElementById('progressBar');
+    const slideCounter = document.getElementById('slideCounter');
+    const dotContainer = document.getElementById('dotContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    // Initialize dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-blue-500 w-6' : 'bg-slate-800 hover:bg-slate-700'}`;
+      dot.onclick = () => goToSlide(i + 1);
+      dotContainer.appendChild(dot);
+    });
+
+    function updateSlide() {
+      slides.forEach(slide => slide.classList.remove('active'));
+      const activeSlide = document.querySelector(`.slide[data-index="${currentSlide}"]`);
+      if (activeSlide) activeSlide.classList.add('active');
+
+      // Update counter and progress bar
+      slideCounter.innerText = `${currentSlide} / ${totalSlides}`;
+      progressBar.style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+      // Update dots
+      Array.from(dotContainer.children).forEach((dot, i) => {
+        if (i === currentSlide - 1) {
+          dot.className = 'w-6 h-2.5 rounded-full bg-blue-500 transition-all duration-300';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-800 hover:bg-slate-700 transition-all duration-300';
+        }
+      });
+
+      // Update button states
+      prevBtn.disabled = currentSlide === 1;
+      if (currentSlide === totalSlides) {
+        nextBtn.innerText = "Finish";
+      } else {
+        nextBtn.innerHTML = `Next <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function goToSlide(n) {
+      currentSlide = n;
+      updateSlide();
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Interactive simulator on Slide 5
+    function simulateAction(type) {
+      const log = document.getElementById('simLog');
+      const badge = document.getElementById('simBadge');
+
+      if (type === 'normal') {
+        log.innerHTML = `
+          <div class="text-slate-300">&gt; Request: <span class="text-cyan-400">Buy $15.00 GitHub Copilot API</span></div>
+          <div class="text-slate-400">&gt; Checking budget ($15.00 &lt;= $50.00)... <span class="text-emerald-400 font-bold">OK</span></div>
+          <div class="text-slate-400">&gt; Checking merchant 'github.com'... <span class="text-emerald-400 font-bold">WHITELISTED</span></div>
+          <div class="text-emerald-400 font-bold mt-1">&gt; APPROVED! Generated 1-time virtual card [4111-xxxx-xxxx-8921]. PayPal payment executed.</div>
+        `;
+        badge.className = "px-2 py-0.5 rounded text-[11px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold";
+        badge.innerText = "TRANSACTION APPROVED (200)";
+      } else if (type === 'rogue') {
+        log.innerHTML = `
+          <div class="text-slate-300">&gt; Request: <span class="text-red-400 font-bold">Buy $450.00 GPU Cloud Instance</span></div>
+          <div class="text-red-400">&gt; Checking budget ($450.00 &gt; $50.00 limit)... <span class="font-bold underline">FAILED</span></div>
+          <div class="text-amber-400">&gt; Anomaly score: 98% (Exceeds agent single-transaction allowance)</div>
+          <div class="text-red-400 font-bold mt-1">&gt; BLOCKED! Zero funds sent. Alert dispatched to team Slack & Dashboard.</div>
+        `;
+        badge.className = "px-2 py-0.5 rounded text-[11px] bg-red-500/20 text-red-400 border border-red-500/30 font-bold";
+        badge.innerText = "OVERCHARGE BLOCKED (403)";
+      } else if (type === 'unapproved') {
+        log.innerHTML = `
+          <div class="text-slate-300">&gt; Request: <span class="text-amber-400">Checkout at 'unverified-crypto-roll.xyz' ($10.00)</span></div>
+          <div class="text-slate-400">&gt; Checking budget ($10.00 &lt;= $50.00)... OK</div>
+          <div class="text-amber-400">&gt; Checking merchant whitelist... <span class="font-bold underline">NOT FOUND</span></div>
+          <div class="text-amber-400 font-bold mt-1">&gt; FROZEN! Unapproved merchant category. Virtual card creation denied.</div>
+        `;
+        badge.className = "px-2 py-0.5 rounded text-[11px] bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold";
+        badge.innerText = "MERCHANT NOT ALLOWED (403)";
+      }
+    }
+  </script>
+</body>
+</html>
