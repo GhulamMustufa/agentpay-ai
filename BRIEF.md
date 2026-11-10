@@ -40,6 +40,6 @@
 - [x] **Day 3 (Nov 6)**: Connect PayPal Sandbox Orders & Invoicing API endpoints.
 - [x] **Day 4 (Nov 7)**: Complete dark/light dashboard UI, live telemetry terminal & receipt generator.
 - [ ] **Day 5 (Nov 8)**: Deploy live HTTPS URL on Render/Vercel with 1-Click Guest Demo Bypass.
-- [x] **Day 6 (Nov 9)**: Verify automated unit & sponsor integration test suites (26/26 passing) and update Playwright E2E selectors.
+- [x] **Day 6 (Nov 9)**: Verify automated unit & sponsor integration test suites (43/43 unit, 7/7 live sponsor, 6/6 Chrome E2E) and update Playwright E2E selectors.
 - [ ] **Day 7 (Nov 10)**: Record 120–150s demo video using updated script ([video/SCRIPT.md](./video/SCRIPT.md)).
 - [ ] **Day 8 (Nov 11 - 24h Early)**: Complete Devpost submission form and publish!

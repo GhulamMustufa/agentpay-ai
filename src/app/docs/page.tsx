@@ -198,17 +198,17 @@ npm run dev
                 </div>
 
                 <p className="text-[11px] text-muted-foreground">
-                  💡 <strong>No file editing required:</strong> You can also paste these keys directly inside the Dashboard by clicking <strong>&quot;Custom Keys&quot;</strong> in the top navigation bar!
+                  💡 <strong>No file editing required:</strong> You can also paste these keys directly inside the Dashboard by clicking <strong>&quot;API Keys&quot;</strong> in the top navigation bar!
                 </p>
               </div>
 
               {/* Running Tests Card */}
               <div className="p-4 rounded-xl border border-border bg-muted/40 space-y-2">
                 <h4 className="font-semibold text-xs text-foreground flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Automated Tests (21/21 Passing)
+                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Automated Tests (43 Unit • 7 Live Edge • 6 E2E)
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed font-normal">
-                  Run <code>npm test</code> to execute all 21 automated safety checks and tests covering payment protection, stopping hidden fees, live API connections, non-shopping questions, and tool safety.
+                  Run <code>npm test</code> for all 43 Vitest checks, <code>npm run test:edge</code> for live Gemini/PayPal/Channel3/Elastic/Neon probes, and <code>npm run test:e2e</code> for Playwright Chrome verification.
                 </p>
               </div>
             </div>
@@ -400,7 +400,7 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Direct connection with official PayPal Orders API to create and complete payments safely in seconds.
                   </p>
-                  <code className="text-[10px] text-primary block mt-1 font-mono">File: src/lib/payments/paypal.ts:3-121</code>
+                  <code className="text-[10px] text-primary block mt-1 font-mono">File: src/lib/payments/paypal.ts:4-166</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -413,7 +413,7 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Ranks store products via Elasticsearch cluster queries or hybrid BM25 token and spec scoring.
                   </p>
-                  <code className="text-[10px] text-emerald-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:173-246</code>
+                  <code className="text-[10px] text-emerald-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:207-320</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -426,7 +426,7 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Queries Channel3 normalized product API (with curated fallback) for live prices and specifications.
                   </p>
-                  <code className="text-[10px] text-purple-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:40-171</code>
+                  <code className="text-[10px] text-purple-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:40-204</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -439,7 +439,7 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Injects PayPal Orders v2 OpenAPI contracts into prompts and validates every order payload before dispatch.
                   </p>
-                  <code className="text-[10px] text-blue-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:248-326</code>
+                  <code className="text-[10px] text-blue-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:323-400</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -452,7 +452,7 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Interactive React data grids with sorting, quick filtering, and CSV export for store quotes and ledger history.
                   </p>
-                  <code className="text-[10px] text-cyan-400 block mt-1 font-mono">File: src/components/grids/StoreComparisonGrid.tsx:1-204</code>
+                  <code className="text-[10px] text-cyan-400 block mt-1 font-mono">File: src/components/grids/StoreComparisonGrid.tsx</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -465,7 +465,7 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Dispatches real-time Catch Hook alerts when hidden fees are blocked or PayPal orders are captured.
                   </p>
-                  <code className="text-[10px] text-amber-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:328-380</code>
+                  <code className="text-[10px] text-amber-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:403-454</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -491,7 +491,20 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Cloud deployment blueprint to launch this app online with zero configuration.
                   </p>
-                  <code className="text-[10px] text-rose-400 block mt-1 font-mono">File: render.yaml:1-28</code>
+                  <code className="text-[10px] text-rose-400 block mt-1 font-mono">File: render.yaml:1-33</code>
+                </div>
+
+                <div className="p-4 rounded-xl border border-border bg-card space-y-1.5 md:col-span-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                      🗄️ Neon Serverless Postgres + LocalStorage Fallback
+                    </span>
+                    <Badge variant="success" className="text-[10px]">Hybrid Database</Badge>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed font-normal">
+                    Persists workspace ledger transactions and spending policies in Neon Postgres with an automatic 30s circuit breaker, write-through `localStorage` cache, and offline-queue reconciliation on reconnect.
+                  </p>
+                  <code className="text-[10px] text-emerald-400 block mt-1 font-mono">File: src/lib/db.ts • src/app/api/ledger/route.ts • src/app/api/policy/route.ts</code>
                 </div>
               </div>
             </div>

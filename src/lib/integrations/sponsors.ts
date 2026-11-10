@@ -44,19 +44,23 @@ export const Channel3 = {
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 3500);
+        const bodyPayload: Record<string, any> = {
+          query,
+          limit: 8,
+        };
+        if (maxPrice && maxPrice > 0) {
+          bodyPayload.filters = {
+            price: { max_price: maxPrice },
+          };
+        }
+
         const res = await fetch("https://api.trychannel3.com/v1/search", {
           method: "POST",
           headers: {
             "x-api-key": apiKey,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            query,
-            filters: {
-              in_stock: true,
-              ...(maxPrice ? { price: { max_price: maxPrice } } : {}),
-            },
-          }),
+          body: JSON.stringify(bodyPayload),
           signal: controller.signal,
         });
         clearTimeout(timeout);
@@ -70,23 +74,53 @@ export const Channel3 = {
                 ? data.results
                 : [];
           if (items.length > 0) {
-            return items
-              .map((p: any, idx: number) => ({
-                id: p.id || `c3-prod-${idx}`,
-                name: p.title || p.name || "Catalog Product",
-                category: Array.isArray(p.categories) ? p.categories[0] : p.category || "General",
-                price: Number(p.price?.price ?? p.price?.amount ?? p.price ?? 0),
-                currency: p.price?.currency || p.currency || "USD",
-                merchant: p.brand_name || p.merchant || p.brand || "Channel3 Verified Retailer",
-                rating: Number(p.rating || 4.7),
-                inStock: p.availability !== "out_of_stock" && p.inStock !== false,
-                specs: p.specs || {
-                  note: p.description?.substring(0, 60) || "Channel3 Verified",
-                  ...(p.url ? { url: p.url } : {}),
-                },
-                score: Number(p.score || 0.92),
-              }))
+            const mapped = items
+              .map((p: any, idx: number) => {
+                const primaryOffer = Array.isArray(p.offers) && p.offers.length > 0 ? p.offers[0] : null;
+                const priceNum = Number(
+                  primaryOffer?.price?.price ??
+                    p.price?.price ??
+                    p.price?.amount ??
+                    (typeof p.price === "number" ? p.price : 0)
+                );
+                const currency = primaryOffer?.price?.currency || p.price?.currency || p.currency || "USD";
+                const brandFromArray = Array.isArray(p.brands) && p.brands.length > 0 ? p.brands[0]?.name : undefined;
+                const merchant =
+                  primaryOffer?.domain || brandFromArray || p.brand_name || p.merchant || "Channel3 Verified Retailer";
+                const categoryTitle =
+                  typeof p.category === "string"
+                    ? p.category
+                    : p.category?.title || (Array.isArray(p.categories) ? p.categories[0] : "General");
+                const availability = primaryOffer?.availability || p.availability;
+
+                const specs: Record<string, string> = {};
+                if (Array.isArray(p.key_features) && p.key_features.length > 0) {
+                  specs.highlights = p.key_features.slice(0, 2).join(" • ");
+                } else if (p.description) {
+                  specs.note = String(p.description).substring(0, 70);
+                }
+                if (primaryOffer?.url || p.url) {
+                  specs.url = primaryOffer?.url || p.url;
+                }
+
+                return {
+                  id: p.id || `c3-prod-${idx}`,
+                  name: p.title || p.name || "Catalog Product",
+                  category: categoryTitle || "General",
+                  price: Number.isFinite(priceNum) ? priceNum : 0,
+                  currency,
+                  merchant,
+                  rating: Number(p.ratings?.average || p.rating || 4.7),
+                  inStock: availability !== "OutOfStock" && availability !== "out_of_stock" && p.inStock !== false,
+                  specs,
+                  score: Number(p.score || 0.94),
+                };
+              })
               .filter((p: ProductResult) => p.price > 0 && (!maxPrice || p.price <= maxPrice));
+
+            if (mapped.length > 0) {
+              return mapped;
+            }
           }
         }
       } catch {
@@ -175,13 +209,42 @@ export const Elastic = {
     const esUrl = process.env.ELASTICSEARCH_URL;
     const esKey = process.env.ELASTICSEARCH_API_KEY;
 
-    // Optional live Elasticsearch cluster query if configured
-    if (esUrl && esKey) {
+    // Optional live Elasticsearch cluster upsert + query if configured
+    if (esUrl && esKey && products.length > 0) {
+      const base = esUrl.replace(/\/$/, "");
+      const index = process.env.ELASTICSEARCH_INDEX || "agentpay-catalog";
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2200);
       try {
-        const index = process.env.ELASTICSEARCH_INDEX || "agentpay-catalog";
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 2500);
-        const res = await fetch(`${esUrl.replace(/\/$/, "")}/${index}/_search`, {
+        // Idempotent bulk index so candidate docs exist in Elastic Serverless before querying
+        const ndjson =
+          products
+            .map((p) => {
+              const action = JSON.stringify({ index: { _index: index, _id: p.id } });
+              const doc = JSON.stringify({
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                merchant: p.merchant,
+                price: p.price,
+                rating: p.rating,
+                specs_text: Object.values(p.specs || {}).join(" "),
+              });
+              return `${action}\n${doc}`;
+            })
+            .join("\n") + "\n";
+
+        await fetch(`${base}/${index}/_bulk?refresh=wait_for`, {
+          method: "POST",
+          headers: {
+            Authorization: `ApiKey ${esKey}`,
+            "Content-Type": "application/x-ndjson",
+          },
+          body: ndjson,
+          signal: controller.signal,
+        });
+
+        const res = await fetch(`${base}/${index}/_search`, {
           method: "POST",
           headers: {
             Authorization: `ApiKey ${esKey}`,
@@ -190,16 +253,23 @@ export const Elastic = {
           body: JSON.stringify({
             size: products.length || 10,
             query: {
-              multi_match: {
-                query,
-                fields: ["name^3", "category^2", "specs.*"],
-                fuzziness: "AUTO",
+              bool: {
+                filter: [{ ids: { values: products.map((p) => p.id) } }],
+                should: [
+                  {
+                    multi_match: {
+                      query,
+                      fields: ["name^3", "category^2", "specs_text", "merchant"],
+                      fuzziness: "AUTO",
+                    },
+                  },
+                ],
+                minimum_should_match: 0,
               },
             },
           }),
           signal: controller.signal,
         });
-        clearTimeout(timeout);
         if (res.ok) {
           const data = await res.json();
           const hitScores = new Map<string, number>();
@@ -208,12 +278,17 @@ export const Elastic = {
               hitScores.set(hit._id, hit._score);
             }
           }
-          if (hitScores.size > 0) {
-            return [...products].sort((a, b) => (hitScores.get(b.id) ?? b.score) - (hitScores.get(a.id) ?? a.score));
+          if (hitScores.size > 0 && Array.from(hitScores.values()).some((s) => s > 0)) {
+            return [...products].sort((a, b) => {
+              const diff = (hitScores.get(b.id) ?? 0) - (hitScores.get(a.id) ?? 0);
+              return diff !== 0 ? diff : b.score - a.score;
+            });
           }
         }
       } catch {
         // Fallback to local hybrid token/spec scorer below
+      } finally {
+        clearTimeout(timeout);
       }
     }
 
@@ -324,17 +399,64 @@ export const APIMatic = {
   },
 };
 
+export function isSafeWebhookTarget(rawUrl: string, allowLocalLoopback = false): boolean {
+  try {
+    const parsed = new URL(rawUrl);
+    const host = parsed.hostname.toLowerCase();
+
+    // Never allow cloud metadata or private intranet hosts on remote calls
+    if (
+      host === "169.254.169.254" ||
+      host.startsWith("169.254.") ||
+      host.startsWith("10.") ||
+      host.startsWith("192.168.") ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
+      host === "0.0.0.0" ||
+      host.endsWith(".internal") ||
+      host.endsWith(".local")
+    ) {
+      return false;
+    }
+
+    const isLoopback = host === "127.0.0.1" || host === "localhost" || host === "::1" || host === "[::1]";
+    if (isLoopback) {
+      return allowLocalLoopback && (parsed.protocol === "http:" || parsed.protocol === "https:");
+    }
+
+    // Outside local loopback tests, strictly enforce HTTPS Zapier Catch Hook hosts for client-supplied overrides
+    return parsed.protocol === "https:" && (host === "hooks.zapier.com" || host.endsWith(".zapier.com"));
+  } catch {
+    return false;
+  }
+}
+
 // 4. Zapier Webhook & Workflow Automation Dispatcher
 export const Zapier = {
   async dispatchEvent(params: {
     event: "POLICY_OVERCHARGE_BLOCKED" | "PAYPAL_ORDER_CAPTURED";
     webhookUrl?: string;
+    allowLocalLoopback?: boolean;
     payload: Record<string, any>;
   }): Promise<ZapierDispatchResult> {
-    const targetUrl = (params.webhookUrl || process.env.ZAPIER_WEBHOOK_URL || "").trim();
+    const clientUrl = (params.webhookUrl || "").trim();
+    const envUrl = (process.env.ZAPIER_WEBHOOK_URL || "").trim();
     const timestamp = new Date().toISOString();
 
-    if (!targetUrl || !/^https:\/\/hooks\.zapier\.com\//i.test(targetUrl) && !/^https?:\/\//i.test(targetUrl)) {
+    if (clientUrl) {
+      if (!isSafeWebhookTarget(clientUrl, Boolean(params.allowLocalLoopback))) {
+        return {
+          dispatched: false,
+          simulated: false,
+          event: params.event,
+          timestamp,
+          error: "Blocked invalid or untrusted webhookUrl (must be https://hooks.zapier.com/...)",
+        };
+      }
+    }
+
+    const targetUrl = clientUrl || envUrl;
+
+    if (!targetUrl || !/^https?:\/\//i.test(targetUrl)) {
       return {
         dispatched: false,
         simulated: true,

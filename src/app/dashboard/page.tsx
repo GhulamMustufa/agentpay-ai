@@ -13,15 +13,19 @@ import { ShoppingQuote } from "@/lib/ai/shopping-agent";
 import {
   UserSpendingPolicy,
   loadUserPolicy,
-  saveUserPolicy,
-  resetUserPolicy,
+  savePolicyWithSync,
+  resetPolicyWithSync,
+  hydratePolicyWithNeonFallback,
   DEFAULT_SPENDING_POLICY,
 } from "@/lib/policy/engine";
 import {
   LedgerRecord,
+  PersistenceMode,
   getLedgerRecords,
   getSavingsSummary,
-  clearLedger,
+  calculateSavingsSummary,
+  hydrateLedgerWithNeonFallback,
+  clearLedgerWithSync,
 } from "@/lib/storage/ledger";
 import { sourcingAgent } from "@/lib/agents/sourcing-agent";
 import { policyAuditorAgent } from "@/lib/agents/auditor-agent";
@@ -64,8 +68,9 @@ export default function DashboardPage() {
   // Policy Engine State
   const [policy, setPolicy] = useState<UserSpendingPolicy>(DEFAULT_SPENDING_POLICY);
 
-  // Persistent Ledger State
+  // Persistent Ledger State (Neon Postgres primary + instant localStorage fallback)
   const [ledger, setLedger] = useState<LedgerRecord[]>([]);
+  const [storageMode, setStorageMode] = useState<PersistenceMode>("localstorage_fallback");
   const [savingsSummary, setSavingsSummary] = useState({ totalSpent: 0, totalSaved: 0, transactionCount: 0, completedCount: 0 });
 
   // Custom Key Configuration State
@@ -176,8 +181,9 @@ export default function DashboardPage() {
     payload: any;
   } | null>(null);
 
-  // Load saved policy, credentials, and ledger on mount
+  // Load saved policy, credentials, and ledger on mount (instant localStorage paint -> async Neon hydration)
   useEffect(() => {
+    let active = true;
     try {
       setPolicy(loadUserPolicy());
       const initialLedger = getLedgerRecords();
@@ -207,14 +213,32 @@ export default function DashboardPage() {
     } catch {
       // Storage unavailable in private browsing mode
     }
+
+    void (async () => {
+      const [ledgerSync, policySync] = await Promise.all([
+        hydrateLedgerWithNeonFallback(),
+        hydratePolicyWithNeonFallback(),
+      ]);
+      if (!active) return;
+
+      setLedger(ledgerSync.records);
+      setSavingsSummary(calculateSavingsSummary(ledgerSync.records));
+      setStorageMode(ledgerSync.storageMode);
+      setPolicy(policySync.policy);
+    })();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const handleSavePolicy = (newPolicy: UserSpendingPolicy) => {
+  const handleSavePolicy = async (newPolicy: UserSpendingPolicy) => {
     setPolicy(newPolicy);
-    saveUserPolicy(newPolicy);
     setIsPolicyOpen(false);
+    const synced = await savePolicyWithSync(newPolicy);
+    setStorageMode(synced.storageMode);
     toast({
-      title: "Rules Saved",
+      title: synced.storageMode === "neon" ? "Rules Synced to Neon DB" : "Rules Saved Locally",
       description: `Allowed extra fee: $${newPolicy.maxMarkupTolerance.toFixed(2)} | Ask confirmation over: $${newPolicy.autoApproveThreshold.toFixed(2)}`,
       type: "success",
     });
@@ -409,13 +433,21 @@ export default function DashboardPage() {
       setAgentPipeline((p) => ({ ...p, auditing: { status: "running" } }));
 
       setTimeout(() => {
-        const auditResult = policyAuditorAgent.auditQuotes(sourcingResult.quotes, budgetCap, policy);
+        const effectiveBudget =
+          budgetCap > 0 && sourcingResult.budgetCap > 0
+            ? Math.min(budgetCap, sourcingResult.budgetCap)
+            : budgetCap;
+        const auditResult = policyAuditorAgent.auditQuotes(sourcingResult.quotes, effectiveBudget, policy);
 
         setAgentPipeline((p) => ({
           ...p,
           auditing: {
-            status: "completed",
-            summary: auditResult.hasDiscrepancy ? `Stopped Overcharge: saved $${auditResult.moneySaved.toFixed(2)}` : "All store prices verified",
+            status: auditResult.approvedQuote ? "completed" : "halted",
+            summary: !auditResult.approvedQuote
+              ? "Blocked: no policy-compliant quotes"
+              : auditResult.hasDiscrepancy
+                ? `Stopped Overcharge: saved $${auditResult.moneySaved.toFixed(2)}`
+                : "All store prices verified",
           },
         }));
 
@@ -426,7 +458,7 @@ export default function DashboardPage() {
           setPolicyAlert({
             vendor: auditResult.violatingQuote.vendor,
             quotedAmount: `$${auditResult.violatingQuote.price.toFixed(2)}`,
-            budgetCap: `$${budgetCap.toFixed(2)}`,
+            budgetCap: `$${effectiveBudget.toFixed(2)}`,
             markup: `$${auditResult.violatingQuote.markup.toFixed(2)}`,
             reason: viols.length > 0 ? viols.join(" • ") : "Unapproved fee",
             violations: viols,
@@ -434,7 +466,7 @@ export default function DashboardPage() {
           void emitZapierAlert("POLICY_OVERCHARGE_BLOCKED", {
             vendor: auditResult.violatingQuote.vendor,
             quotedAmount: auditResult.violatingQuote.price,
-            budgetCap,
+            budgetCap: effectiveBudget,
             blockedMarkup: auditResult.violatingQuote.markup,
             reason: viols.join(" • ") || "Unapproved fee",
           });
@@ -471,6 +503,18 @@ export default function DashboardPage() {
             ]);
             executeSettlementInternal(approved.item, approved.vendor, approved.price, auditResult.moneySaved);
           }
+        } else {
+          setIsRunning(false);
+          setPendingApproval(false);
+          setStatus("idle");
+          setWarningMessage(
+            `No merchant quotes satisfied your budget limit ($${effectiveBudget.toFixed(2)}) and safety rules. Checkout blocked safely.`
+          );
+          toast({
+            title: "All Quotes Blocked by Rules",
+            description: "No merchant quote passed your active spending policy.",
+            type: "error",
+          });
         }
       }, 700);
     } catch (err: any) {
@@ -527,12 +571,13 @@ export default function DashboardPage() {
       // Refresh Ledger & Savings
       const updatedLedger = getLedgerRecords();
       setLedger(updatedLedger);
-      setSavingsSummary(getSavingsSummary());
+      setSavingsSummary(calculateSavingsSummary(updatedLedger));
+      setStorageMode(settlement.storageMode);
 
       setLogs((prev) => [
         ...prev,
         `✨ Payment Confirmed in ${settlement.latencyMs}ms! PayPal Order #${settlement.orderId} captured safely.`,
-        `Saved to history: prevented $${moneySaved.toFixed(2)} in hidden charges.`,
+        `Saved to ${settlement.storageMode === "neon" ? "Neon Postgres + localStorage cache" : "localStorage fallback queue"}: prevented $${moneySaved.toFixed(2)} in hidden charges.`,
       ]);
 
       void emitZapierAlert("PAYPAL_ORDER_CAPTURED", {
@@ -1033,13 +1078,21 @@ export default function DashboardPage() {
             {/* TAB 2: AUDIT LEDGER (AG Grid) */}
             {activeConsoleTab === "ledger" && (
               <div className="space-y-2 text-xs font-sans animate-in fade-in">
-                <div className="flex items-center justify-between text-xs text-muted-foreground pb-1">
-                  <span>Saved history of past purchases and extra fees prevented:</span>
+                <div className="flex items-center justify-between flex-wrap gap-2 text-xs text-muted-foreground pb-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span>Saved history of past purchases and extra fees prevented:</span>
+                    <Badge variant={storageMode === "neon" ? "success" : "secondary"} className="text-[10px] font-medium">
+                      {storageMode === "neon"
+                        ? "🟢 Neon Postgres Synced"
+                        : "🟡 LocalStorage Fallback (Auto-Sync Queued)"}
+                    </Badge>
+                  </div>
                   <button
-                    onClick={() => {
-                      clearLedger();
+                    onClick={async () => {
+                      const res = await clearLedgerWithSync();
                       setLedger(getLedgerRecords());
                       setSavingsSummary(getSavingsSummary());
+                      setStorageMode(res.storageMode);
                     }}
                     className="text-[10px] text-muted-foreground hover:text-foreground underline"
                   >
@@ -1216,9 +1269,10 @@ export default function DashboardPage() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => {
+              onClick={async () => {
                 setPolicy(DEFAULT_SPENDING_POLICY);
-                resetUserPolicy();
+                const res = await resetPolicyWithSync();
+                setStorageMode(res.storageMode);
                 toast({ title: "Rules Reset", description: "Reverted to recommended safety rules.", type: "info" });
               }}
               className="text-xs"
@@ -1260,6 +1314,12 @@ export default function DashboardPage() {
                 <span>Zapier Webhooks:</span>
                 <span className={hasLiveZapier ? "text-emerald-400 font-semibold" : "text-muted-foreground font-medium"}>
                   {hasLiveZapier ? "🟢 Live Webhook Active" : "⚪ Ready in Test Mode"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Ledger Persistence:</span>
+                <span className={storageMode === "neon" ? "text-emerald-400 font-semibold" : "text-amber-400 font-medium"}>
+                  {storageMode === "neon" ? "🟢 Neon Postgres (+ localStorage cache)" : "🟡 LocalStorage Fallback"}
                 </span>
               </div>
             </div>
@@ -1393,37 +1453,43 @@ export default function DashboardPage() {
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">💳 PayPal Developer Platform</h4>
             <p>Creates checkout orders and captures payments safely using the PayPal Orders v2 API &amp; OAuth2.</p>
-            <code className="text-[10px] font-mono text-primary block mt-1">src/lib/payments/paypal.ts:3-121</code>
+            <code className="text-[10px] font-mono text-primary block mt-1">src/lib/payments/paypal.ts:4-166</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">📦 Channel3 Product Catalog</h4>
             <p>Queries real-time product inventory and pricing via Channel3 API with curated catalog fallback.</p>
-            <code className="text-[10px] font-mono text-purple-400 block mt-1">src/lib/integrations/sponsors.ts:40-171</code>
+            <code className="text-[10px] font-mono text-purple-400 block mt-1">src/lib/integrations/sponsors.ts:40-204</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">📊 AG Grid Enterprise Data Grids</h4>
             <p>Powers interactive store comparison, sorting, quick filtering, and CSV export across quotes and ledger history.</p>
-            <code className="text-[10px] font-mono text-cyan-400 block mt-1">src/components/grids/StoreComparisonGrid.tsx:1-204</code>
+            <code className="text-[10px] font-mono text-cyan-400 block mt-1">src/components/grids/StoreComparisonGrid.tsx</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">📄 APIMatic OpenAPI Schema Context</h4>
             <p>Injects PayPal Orders v2 OpenAPI contracts into prompts and validates every order payload before dispatch.</p>
-            <code className="text-[10px] font-mono text-blue-400 block mt-1">src/lib/integrations/sponsors.ts:248-326</code>
+            <code className="text-[10px] font-mono text-blue-400 block mt-1">src/lib/integrations/sponsors.ts:323-400</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">🔍 Elastic Hybrid Search</h4>
             <p>Ranks product matches via Elasticsearch cluster queries or hybrid BM25 token + spec scoring.</p>
-            <code className="text-[10px] font-mono text-emerald-400 block mt-1">src/lib/integrations/sponsors.ts:173-246</code>
+            <code className="text-[10px] font-mono text-emerald-400 block mt-1">src/lib/integrations/sponsors.ts:207-320</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">⚡ Zapier Webhook Automation</h4>
             <p>Dispatches real-time webhook alerts on blocked hidden fees and captured PayPal orders.</p>
-            <code className="text-[10px] font-mono text-amber-400 block mt-1">src/lib/integrations/sponsors.ts:328-380 • src/app/api/zapier/webhook/route.ts</code>
+            <code className="text-[10px] font-mono text-amber-400 block mt-1">src/lib/integrations/sponsors.ts:403-454 • src/app/api/zapier/webhook/route.ts</code>
+          </div>
+
+          <div className="p-3 rounded-lg border border-border bg-card">
+            <h4 className="font-semibold text-foreground mb-0.5">🗄️ Neon Serverless Postgres + LocalStorage Fallback</h4>
+            <p>Stores audit ledger history and spending policies in Neon Postgres with automatic circuit breaker &amp; offline localStorage sync.</p>
+            <code className="text-[10px] font-mono text-emerald-400 block mt-1">src/lib/db.ts • src/app/api/ledger/route.ts • src/app/api/policy/route.ts</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">

@@ -48,11 +48,7 @@ export class PolicyAuditorAgent {
       }
     }
 
-    // Fallback if none explicitly compliant or non-compliant
-    if (!approvedQuote && quotes.length > 0) {
-      approvedQuote = quotes[0];
-    }
-
+    // Fail-closed security invariant: never approve a quote unless it passes user policy
     const moneySaved = violatingQuote && approvedQuote
       ? Math.max(0, violatingQuote.price - approvedQuote.price)
       : 0;
@@ -63,7 +59,7 @@ export class PolicyAuditorAgent {
 
     if (violatingQuote) {
       auditLogs.push(
-        `🛡️ Stopped Overcharge: Rejected ${violatingQuote.vendor} ($${violatingQuote.price.toFixed(2)}). Saved you $${moneySaved.toFixed(2)}!`
+        `🛡️ Stopped Overcharge: Rejected ${violatingQuote.vendor} ($${violatingQuote.price.toFixed(2)}). ${approvedQuote ? `Saved you $${moneySaved.toFixed(2)}!` : "Awaiting compliant vendor quote."}`
       );
     }
 
@@ -77,6 +73,10 @@ export class PolicyAuditorAgent {
           `⚡ Safe to Auto-Pay: ${approvedQuote.vendor} ($${approvedQuote.price.toFixed(2)}) is under your $${policy.autoApproveThreshold.toFixed(2)} rule.`
         );
       }
+    } else if (quotes.length > 0) {
+      auditLogs.push(
+        `🚫 Financial Firewall Triggered: No vendor quotes satisfied all active rules (Budget: $${budgetCap.toFixed(2)}, Max fee: $${policy.maxMarkupTolerance.toFixed(2)}). Checkout blocked.`
+      );
     }
 
     return {

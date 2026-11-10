@@ -3,8 +3,9 @@ services:
     name: agentpay-ai
     env: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci --no-audit --no-fund && npm run build
     startCommand: npm run start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -16,6 +17,8 @@ services:
         sync: false
       - key: PAYPAL_CLIENT_SECRET
         sync: false
+      - key: DATABASE_URL
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: CHANNEL3_API_KEY
@@ -26,3 +29,5 @@ services:
         sync: false
       - key: ELASTICSEARCH_API_KEY
         sync: false
+      - key: ELASTICSEARCH_INDEX
+        value: agentpay-catalog

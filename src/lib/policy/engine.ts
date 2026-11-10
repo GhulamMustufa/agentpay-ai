@@ -2,7 +2,14 @@
  * User Spending Policy Engine & Guardrail Evaluator
  * Enforces customizable rules: markup tolerance, merchant verification,
  * auto-approve thresholds, and condition restrictions.
+ *
+ * Hybrid Persistence Strategy:
+ *   1. Instant synchronous read/write via localStorage
+ *   2. Read-through / write-through sync with Neon Serverless Postgres (/api/policy)
+ *   3. Queues offline policy edits cleanly for auto-sync when Neon recovers
  */
+
+import { getOrCreateWorkspaceId, type PersistenceMode } from "@/lib/storage/ledger";
 
 export interface UserSpendingPolicy {
   maxMarkupTolerance: number;      // e.g. 0.00 (Zero unapproved markup tolerance)
@@ -37,6 +44,7 @@ export function evaluateQuoteAgainstPolicy(
     price: number;
     markup: number;
     markupReason?: string;
+    shippingFee?: number;
     isCompliant?: boolean;
   },
   budgetCap: number,
@@ -58,9 +66,23 @@ export function evaluateQuoteAgainstPolicy(
     );
   }
 
+  // Rule 2b: Explicit Shipping Cap Enforcement
+  if (typeof quote.shippingFee === "number" && Number.isFinite(quote.shippingFee) && quote.shippingFee > policy.maxShippingFee) {
+    violations.push(
+      `$${quote.shippingFee.toFixed(2)} shipping exceeds $${policy.maxShippingFee.toFixed(2)} cap`
+    );
+  }
+
   // Rule 3: Merchant Verification
-  const isVerified = quote.vendor.toLowerCase().includes("verified") || quote.vendor.toLowerCase().includes("official");
-  if (policy.requireVerifiedMerchants && !isVerified && !quote.isCompliant) {
+  const lowerVendor = quote.vendor.toLowerCase();
+  const isVerified =
+    lowerVendor.includes("verified") ||
+    lowerVendor.includes("official") ||
+    lowerVendor.includes("authorized") ||
+    lowerVendor.includes("certified");
+  const isSuspiciousMerchant =
+    lowerVendor.includes("unverified") || lowerVendor.includes("unknown") || lowerVendor.includes("sketchy");
+  if (policy.requireVerifiedMerchants && (isSuspiciousMerchant || (!isVerified && !quote.isCompliant))) {
     violations.push("Not PayPal-verified");
   }
 
@@ -92,6 +114,7 @@ export function evaluateQuoteAgainstPolicy(
  * Storage helpers for browser persistence
  */
 const POLICY_STORAGE_KEY = "agentpay_spending_policy";
+const PENDING_POLICY_SYNC_KEY = "agentpay_pending_policy_sync";
 
 export function loadUserPolicy(): UserSpendingPolicy {
   if (typeof window === "undefined") return DEFAULT_SPENDING_POLICY;
@@ -122,4 +145,78 @@ export function resetUserPolicy(): UserSpendingPolicy {
     }
   }
   return DEFAULT_SPENDING_POLICY;
+}
+
+export async function savePolicyWithSync(policy: UserSpendingPolicy): Promise<{
+  policy: UserSpendingPolicy;
+  storageMode: PersistenceMode;
+}> {
+  saveUserPolicy(policy);
+  if (typeof window === "undefined") {
+    return { policy, storageMode: "localstorage_fallback" };
+  }
+
+  try {
+    localStorage.setItem(PENDING_POLICY_SYNC_KEY, "true");
+    const workspaceId = getOrCreateWorkspaceId();
+    const res = await fetch("/api/policy", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workspaceId, policy }),
+      signal: AbortSignal.timeout(4000),
+    });
+    const data = await res.json();
+    if (res.ok && data?.source === "neon") {
+      localStorage.removeItem(PENDING_POLICY_SYNC_KEY);
+      return { policy: data.policy || policy, storageMode: "neon" };
+    }
+    return { policy, storageMode: "localstorage_fallback" };
+  } catch {
+    return { policy, storageMode: "localstorage_fallback" };
+  }
+}
+
+export async function resetPolicyWithSync(): Promise<{
+  policy: UserSpendingPolicy;
+  storageMode: PersistenceMode;
+}> {
+  const defaults = resetUserPolicy();
+  return savePolicyWithSync(defaults);
+}
+
+export async function hydratePolicyWithNeonFallback(): Promise<{
+  policy: UserSpendingPolicy;
+  storageMode: PersistenceMode;
+}> {
+  const localPolicy = loadUserPolicy();
+  if (typeof window === "undefined") {
+    return { policy: localPolicy, storageMode: "localstorage_fallback" };
+  }
+
+  const workspaceId = getOrCreateWorkspaceId();
+
+  // Push any offline pending policy change to Neon first so local changes win
+  try {
+    if (localStorage.getItem(PENDING_POLICY_SYNC_KEY) === "true") {
+      return await savePolicyWithSync(localPolicy);
+    }
+  } catch {
+    return { policy: localPolicy, storageMode: "localstorage_fallback" };
+  }
+
+  try {
+    const res = await fetch(`/api/policy?workspaceId=${encodeURIComponent(workspaceId)}`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(4000),
+    });
+    const data = await res.json();
+    if (res.ok && data?.source === "neon" && data?.policy) {
+      const merged = { ...DEFAULT_SPENDING_POLICY, ...data.policy };
+      saveUserPolicy(merged);
+      return { policy: merged, storageMode: "neon" };
+    }
+    return { policy: localPolicy, storageMode: "localstorage_fallback" };
+  } catch {
+    return { policy: localPolicy, storageMode: "localstorage_fallback" };
+  }
 }

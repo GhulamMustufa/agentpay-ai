@@ -90,7 +90,8 @@ export function LedgerHistoryGrid({ records }: LedgerHistoryGridProps) {
         cellRenderer: (params: ICellRendererParams<LedgerRecord>) => {
           const r = params.data;
           if (!r) return null;
-          return r.receiptUrl ? (
+          const isSafeReceiptUrl = Boolean(r.receiptUrl && /^https?:\/\//i.test(r.receiptUrl));
+          return isSafeReceiptUrl ? (
             <a
               href={r.receiptUrl}
               target="_blank"
@@ -124,7 +125,15 @@ export function LedgerHistoryGrid({ records }: LedgerHistoryGridProps) {
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => gridRef.current?.api?.exportDataAsCsv({ fileName: "agentpay-ledger.csv" })}
+          onClick={() =>
+            gridRef.current?.api?.exportDataAsCsv({
+              fileName: "agentpay-ledger.csv",
+              processCellCallback: (params) => {
+                const raw = String(params.value ?? "");
+                return /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
+              },
+            })
+          }
           className="h-6 px-2 text-[10px]"
         >
           <Download className="w-2.5 h-2.5 mr-1" /> Export Ledger CSV

@@ -1,6 +1,6 @@
 # 📊 Presentation Pitch Deck: AgentPay AI
 
-> Interactive web deck also available at [`public/slides.html`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/public/slides.html) (navigate with `←` / `→` keys).
+> Interactive web deck also available at [`public/slides.html`](../public/slides.html) (navigate with `←` / `→` keys).
 
 ---
 

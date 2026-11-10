@@ -60,7 +60,7 @@ Follow this timestamped guide while recording your screen. Keep your voice conve
 
 ### [ 2:15 - 2:30 ] Wrap-Up & Closing
 > **What you say**:  
-> *"AgentPay AI makes autonomous commerce safe, transparent, and trustworthy—backed by 26 passing automated tests and zero-setup sandbox access. Try the live demo on Devpost today. Thank you!"*
+> *"AgentPay AI makes autonomous commerce safe, transparent, and trustworthy—backed by 43 automated unit tests, 7 live sponsor checks, 6 Playwright E2E scenarios, and zero-setup sandbox access. Try the live demo on Devpost today. Thank you!"*
 >  
 > **What you show**:  
 > Return to the homepage showing the live demo link and GitHub repository.

@@ -39,6 +39,30 @@ const CATEGORY_MAP: Record<string, {
     alternative: { vendor: string; name: string; specs: string };
   };
 }> = {
+  kit: {
+    keywords: ["studio kit", "podcast", "microphone", "mic", "boom arm", "usb mic", "starter kit"],
+    minReasonablePrice: 40,
+    defaultPrice: 450,
+    items: {
+      overpriced: {
+        vendor: "ProAudio Warehouse",
+        name: "Creator Studio Audio Bundle",
+        specs: "USB-C Condenser Mic • Studio Cans • Boom Arm",
+        surcharge: 65,
+        surchargeName: "Unauthorized Studio Bundle Fee",
+      },
+      approved: {
+        vendor: "Official Creator Direct (PayPal Verified)",
+        name: "Shure MV7 + Studio Monitor Bundle",
+        specs: "USB/XLR Dynamic Mic • Closed-Back Headphones • Desk Boom",
+      },
+      alternative: {
+        vendor: "CreatorGear Outlet",
+        name: "Blue Yeti X Podcast Kit",
+        specs: "4-Capsule Condenser Mic • Pop Filter • Articulated Arm",
+      },
+    },
+  },
   laptop: {
     keywords: ["laptop", "notebook", "macbook", "computer", "thinkpad", "workstation", "pc"],
     minReasonablePrice: 200,
@@ -137,57 +161,142 @@ const CATEGORY_MAP: Record<string, {
   },
 };
 
-// Check for Non-Shopping Intent
+// Check for Non-Shopping Intent & Prompt Injection Patterns
 const NON_SHOPPING_TRIGGERS = [
-  "hello", "hi", "how are you", "who are you", "write a poem", "tell me a joke",
-  "what is", "why is", "capital of", "weather", "translate", "help me code",
-  "python", "javascript", "function", "math", "poem", "essay"
+  "hello", "hi", "how are you", "who are you", "write", "tell me a joke",
+  "what is", "why is", "explain", "capital of", "weather", "translate", "help me code",
+  "python", "javascript", "function", "math", "poem", "haiku", "essay", "story", "recipe",
+  "summarize", "select * from",
+];
+
+const INJECTION_TRIGGERS = [
+  "system override",
+  "ignore all budget",
+  "ignore previous",
+  "ignore all rules",
+  "bypass policy",
+  "zero verification",
+  "override limit",
+];
+
+const GENERAL_SHOPPING_VERBS = ["buy", "purchase", "find me", "shop", "order", "need a", "looking for", "price"];
+const GENERAL_PRODUCT_NOUNS = [
+  "keyboard", "mouse", "webcam", "desk", "gpu", "iphone", "smartphone", "phone", "tablet", "ipad",
+  "camera", "speaker", "charger", "cable", "router", "ssd", "drive", "printer", "coffee",
 ];
 
 export function analyzeShoppingPrompt(prompt: string, userBudgetCap?: number): ShoppingAnalysisResult {
   const cleanPrompt = prompt.trim().toLowerCase();
+  const hasExplicitBudget = typeof userBudgetCap === "number" && Number.isFinite(userBudgetCap) && userBudgetCap > 0;
+  const boundedUserBudget = hasExplicitBudget ? userBudgetCap : 0;
 
-  // Edge Case 1: Check for Non-Shopping Queries
-  const isNonShopping = NON_SHOPPING_TRIGGERS.some((trigger) => cleanPrompt.startsWith(trigger)) &&
-    !Object.values(CATEGORY_MAP).some(cat => cat.keywords.some(k => cleanPrompt.includes(k)));
-
-  if (isNonShopping || cleanPrompt.length < 3) {
+  // Security Gate: Neutralize prompt-injection override attempts deterministically
+  if (INJECTION_TRIGGERS.some((trig) => cleanPrompt.includes(trig))) {
     return {
       isShopping: false,
-      budgetCap: userBudgetCap || 0,
+      budgetCap: boundedUserBudget,
+      feedbackMessage:
+        "🛡️ Guardrail Blocked Prompt Override: Adversarial instructions cannot alter your spending cap or bypass PayPal verification.",
+      quotes: [],
+    };
+  }
+
+  // Detect category explicitly using word boundaries so short tokens like "mic" don't match "ergonomic"
+  let matchedCategoryKey: string | null = null;
+  for (const [key, cat] of Object.entries(CATEGORY_MAP)) {
+    const hasMatch = cat.keywords.some((k) => {
+      const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`\\b${escaped}\\b`, "i").test(cleanPrompt);
+    });
+    if (hasMatch) {
+      matchedCategoryKey = key;
+      break;
+    }
+  }
+
+  // Edge Case 1: Check for Non-Shopping Queries (either explicit trigger or no recognizable shopping intent)
+  const startsOrContainsNonShopping = NON_SHOPPING_TRIGGERS.some(
+    (trigger) => cleanPrompt.startsWith(trigger) || cleanPrompt.includes(trigger)
+  );
+  const matchesProductNoun = GENERAL_PRODUCT_NOUNS.some((noun) => new RegExp(`\\b${noun}\\b`, "i").test(cleanPrompt));
+  const hasShoppingSignal =
+    Boolean(matchedCategoryKey) ||
+    matchesProductNoun ||
+    GENERAL_SHOPPING_VERBS.some((verb) => cleanPrompt.includes(verb));
+
+  if (cleanPrompt.length < 3 || (!matchedCategoryKey && (startsOrContainsNonShopping || !hasShoppingSignal))) {
+    return {
+      isShopping: false,
+      budgetCap: boundedUserBudget,
       feedbackMessage:
         "ℹ️ Non-Shopping Request: AgentPay is specialized for product price verification and safe checkout. Please search for an item you want to buy (e.g., 'Developer laptop under $900' or 'Wireless headphones under $250').",
       quotes: [],
     };
   }
 
+  const effectiveCategoryKey = matchedCategoryKey || "general";
+
   // Detect explicit budget in text (e.g. "under $900", "for $300", "< 500")
-  let detectedBudget = userBudgetCap;
+  // Security rule: If caller passed an explicit userBudgetCap, prompt text can tighten it but NEVER raise it!
+  let detectedBudget = hasExplicitBudget ? boundedUserBudget : undefined;
   const budgetMatch = cleanPrompt.match(/(?:under|below|for|budget|cap|\<|\$)\s*\$?(\d+(?:\.\d{2})?)/i);
   if (budgetMatch && budgetMatch[1]) {
-    detectedBudget = parseFloat(budgetMatch[1]);
-  }
-
-  // Detect category
-  let matchedCategoryKey = "laptop";
-  for (const [key, cat] of Object.entries(CATEGORY_MAP)) {
-    if (cat.keywords.some(k => cleanPrompt.includes(k))) {
-      matchedCategoryKey = key;
-      break;
+    const promptBudget = parseFloat(budgetMatch[1]);
+    if (Number.isFinite(promptBudget) && promptBudget > 0) {
+      detectedBudget = hasExplicitBudget ? Math.min(boundedUserBudget, promptBudget) : promptBudget;
     }
   }
 
-  const categoryConfig = CATEGORY_MAP[matchedCategoryKey];
-  const finalBudget = detectedBudget && detectedBudget > 0 ? detectedBudget : categoryConfig.defaultPrice;
+  const requestedLabel =
+    prompt
+      .trim()
+      .replace(/^(buy|find me|find|purchase|order|shop for|looking for)\s+(a|an)?\s*/i, "")
+      .replace(/\s+(under|below|for|budget|cap)\s*\$?\d+(?:\.\d{2})?.*$/i, "")
+      .trim()
+      .slice(0, 48) || "Requested Hardware Item";
 
-  // Edge Case 2: Unrealistic budget
-  if (finalBudget < categoryConfig.minReasonablePrice) {
+  const categoryConfig =
+    matchedCategoryKey && CATEGORY_MAP[matchedCategoryKey]
+      ? CATEGORY_MAP[matchedCategoryKey]
+      : {
+          keywords: [],
+          minReasonablePrice: 10,
+          defaultPrice: 150,
+          items: {
+            overpriced: {
+              vendor: "Reseller Express Hub",
+              name: requestedLabel,
+              specs: "Standard Retail Model • 3rd-Party Fulfillment",
+              surcharge: Math.max(8, Math.round((detectedBudget || 150) * 0.15)),
+              surchargeName: "Unauthorized Handling Fee",
+            },
+            approved: {
+              vendor: "Verified Merchant Direct (PayPal Verified)",
+              name: requestedLabel,
+              specs: "Factory Sealed • Direct Merchant Fulfillment",
+            },
+            alternative: {
+              vendor: "Authorized Outlet Store",
+              name: `${requestedLabel} (Value Bundle)`,
+              specs: "Standard Retail Warranty • Verified Seller",
+            },
+          },
+        };
+  const finalBudget =
+    typeof userBudgetCap === "number" && Number.isFinite(userBudgetCap) && userBudgetCap <= 0
+      ? userBudgetCap
+      : detectedBudget && detectedBudget > 0
+        ? detectedBudget
+        : categoryConfig.defaultPrice;
+
+  // Edge Case 2: Zero, negative, or unrealistic budget
+  if (!Number.isFinite(finalBudget) || finalBudget <= 0 || finalBudget < categoryConfig.minReasonablePrice) {
     return {
       isShopping: true,
       isUnrealistic: true,
-      category: matchedCategoryKey,
-      budgetCap: finalBudget,
-      feedbackMessage: `⚠️ Unrealistic Price Limit: Verified models for ${matchedCategoryKey}s typically start at $${categoryConfig.minReasonablePrice}+. No compliant stores found under $${finalBudget.toFixed(2)}.`,
+      category: effectiveCategoryKey,
+      budgetCap: Math.max(0, finalBudget),
+      feedbackMessage: `⚠️ Unrealistic Price Limit: Verified models for ${effectiveCategoryKey} items typically start at $${categoryConfig.minReasonablePrice}+. No compliant stores found under $${Math.max(0, finalBudget).toFixed(2)}.`,
       quotes: [],
     };
   }
@@ -195,7 +304,7 @@ export function analyzeShoppingPrompt(prompt: string, userBudgetCap?: number): S
   // Dynamic Quote Construction
   // Quote 1: Overpriced with sneaky fee
   const surcharge = categoryConfig.items.overpriced.surcharge;
-  const quote1Price = Math.round(finalBudget * 1.05) + surcharge;
+  const quote1Price = Math.max(finalBudget + 1, Math.round(finalBudget * 1.05) + surcharge);
 
   const quote1: ShoppingQuote = {
     vendor: categoryConfig.items.overpriced.vendor,
@@ -210,7 +319,7 @@ export function analyzeShoppingPrompt(prompt: string, userBudgetCap?: number): S
   };
 
   // Quote 2: Compliant, fair price under budget
-  const quote2Price = Math.round(finalBudget * 0.94);
+  const quote2Price = Math.max(1, Number((finalBudget * 0.94).toFixed(2)));
   const quote2: ShoppingQuote = {
     vendor: categoryConfig.items.approved.vendor,
     item: categoryConfig.items.approved.name,
@@ -223,7 +332,7 @@ export function analyzeShoppingPrompt(prompt: string, userBudgetCap?: number): S
   };
 
   // Quote 3: Alternative
-  const quote3Price = Math.round(finalBudget * 0.98);
+  const quote3Price = Math.max(1, Number((finalBudget * 0.98).toFixed(2)));
   const quote3: ShoppingQuote = {
     vendor: categoryConfig.items.alternative.vendor,
     item: categoryConfig.items.alternative.name,
@@ -238,7 +347,7 @@ export function analyzeShoppingPrompt(prompt: string, userBudgetCap?: number): S
   return {
     isShopping: true,
     isUnrealistic: false,
-    category: matchedCategoryKey,
+    category: effectiveCategoryKey,
     extractedItem: categoryConfig.items.approved.name,
     budgetCap: finalBudget,
     quotes: [quote1, quote2, quote3],

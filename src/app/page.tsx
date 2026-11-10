@@ -174,7 +174,7 @@ export default function LandingPage() {
                   <CheckCircle className="w-4 h-4 text-purple-400" /> Fully Tested
                 </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Includes 21 automated safety checks and tests that verify payment safety, budget limits, and live PayPal API connections.
+                  Includes 34 automated safety checks and 4 live edge tests verifying payment safety, budget limits, Neon persistence failover, sponsor connectors, and live PayPal API connections.
                 </p>
               </Card>
             </TabsContent>

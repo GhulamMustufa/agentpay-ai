@@ -163,6 +163,49 @@
           "path": ["api", "zapier", "webhook"]
         }
       }
+    },
+    {
+      "name": "9. AgentPay Health & Neon Telemetry",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "10. AgentPay Neon + LocalStorage Ledger Read",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/ledger?workspaceId=default",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "ledger"],
+          "query": [{ "key": "workspaceId", "value": "default" }]
+        }
+      }
+    },
+    {
+      "name": "11. AgentPay Live Safety Edge Tests",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/edge-tests",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "edge-tests"]
+        }
+      }
     }
   ]
 }

@@ -174,15 +174,32 @@ export async function handleMCPRequest(request: {
       }
 
       if (toolName === "paypal_create_order") {
-        const budgetCap = args.budgetCap || 900.00;
-        if (args.amount > budgetCap && !args.overrideToken) {
+        const rawBudgetCap = args.budgetCap !== undefined ? Number(args.budgetCap) : 900.0;
+        if (!Number.isFinite(rawBudgetCap) || rawBudgetCap <= 0 || rawBudgetCap > 25000) {
           return {
             jsonrpc: "2.0",
             id,
             error: {
               code: -32001,
-              message: `PolicyViolation: Quoted amount $${args.amount} exceeds pre-set session budget cap of $${budgetCap}. Transaction halted by AgentPay Trust Layer.`
-            }
+              message: "PolicyViolation: Invalid or excessive budgetCap (must be > $0 and <= $25,000).",
+            },
+          };
+        }
+
+        const overrideSecret = process.env.MCP_OVERRIDE_SECRET;
+        const hasValidOverride =
+          Boolean(overrideSecret) &&
+          typeof args.overrideToken === "string" &&
+          args.overrideToken === overrideSecret;
+
+        if (Number(args.amount) > rawBudgetCap && !hasValidOverride) {
+          return {
+            jsonrpc: "2.0",
+            id,
+            error: {
+              code: -32001,
+              message: `PolicyViolation: Quoted amount $${args.amount} exceeds pre-set session budget cap of $${rawBudgetCap}. Transaction halted by AgentPay Trust Layer.`,
+            },
           };
         }
 
@@ -238,8 +255,28 @@ export async function handleMCPRequest(request: {
       }
 
       if (toolName === "paypal_capture_order") {
+        if (typeof args.orderId !== "string" || !args.orderId.trim()) {
+          return {
+            jsonrpc: "2.0",
+            id,
+            error: { code: -32602, message: "Invalid params: Missing orderId." },
+          };
+        }
+        if (typeof args.approvalToken !== "string" || args.approvalToken.trim().length < 8) {
+          return {
+            jsonrpc: "2.0",
+            id,
+            error: {
+              code: -32602,
+              message: "Invalid params: Missing or malformed human-in-the-loop approvalToken.",
+            },
+          };
+        }
+
+        const t0 = performance.now();
         const gateway = getPaymentGateway();
         const captureResult = await gateway.captureOrder(args.orderId);
+        const settlementLatencyMs = Math.max(1, Math.round(performance.now() - t0));
         return {
           jsonrpc: "2.0",
           id,
@@ -251,7 +288,7 @@ export async function handleMCPRequest(request: {
                   orderId: captureResult.id,
                   status: captureResult.status,
                   receiptId: "RCP-" + Date.now().toString(36).toUpperCase(),
-                  settlementLatencyMs: 312,
+                  settlementLatencyMs,
                 }),
               },
             ],

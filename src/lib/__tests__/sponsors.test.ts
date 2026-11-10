@@ -1,9 +1,60 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { APIMatic, Channel3, Elastic, Zapier } from "../integrations/sponsors";
 import { POST as zapierWebhookRoute } from "@/app/api/zapier/webhook/route";
 import { NextRequest } from "next/server";
 
 describe("Official Sponsor Integrations Unit Tests", () => {
+  const origFetch = globalThis.fetch;
+  const origChannel3Key = process.env.CHANNEL3_API_KEY;
+
+  afterEach(() => {
+    globalThis.fetch = origFetch;
+    if (origChannel3Key) {
+      process.env.CHANNEL3_API_KEY = origChannel3Key;
+    } else {
+      delete process.env.CHANNEL3_API_KEY;
+    }
+  });
+
+  it("Channel3 parses nested offers[].price.price schema and excludes invalid in_stock filter", async () => {
+    process.env.CHANNEL3_API_KEY = "c3_test_key";
+    let sentBody: any = null;
+    globalThis.fetch = vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
+      sentBody = JSON.parse(String(init?.body || "{}"));
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          products: [
+            {
+              id: "C3LIVE1",
+              title: "Lenovo ThinkPad T16 16GB RAM",
+              category: { slug: "laptops", title: "Laptops" },
+              brands: [{ id: "len", name: "Lenovo" }],
+              key_features: ["Intel Core i7", "16GB DDR4", "512GB NVMe SSD"],
+              offers: [
+                {
+                  domain: "newegg.com",
+                  url: "https://buy.trychannel3.com/example",
+                  price: { price: 699, currency: "USD" },
+                  availability: "InStock",
+                },
+              ],
+            },
+          ],
+        }),
+      } as any;
+    }) as any;
+
+    const results = await Channel3.searchProducts("developer laptop", 900);
+    expect(sentBody.filters?.in_stock).toBeUndefined();
+    expect(sentBody.filters?.price?.max_price).toBe(900);
+    expect(results).toHaveLength(1);
+    expect(results[0].price).toBe(699);
+    expect(results[0].merchant).toBe("newegg.com");
+    expect(results[0].category).toBe("Laptops");
+  });
+
   it("Channel3 returns curated products filtered by maxPrice when no live key is set", async () => {
     delete process.env.CHANNEL3_API_KEY;
     const results = await Channel3.searchProducts("developer laptop", 860);
@@ -74,6 +125,18 @@ describe("Official Sponsor Integrations Unit Tests", () => {
     });
     const badRes = await zapierWebhookRoute(badReq);
     expect(badRes.status).toBe(400);
+
+    const ssrfReq = new NextRequest(new URL("https://agentpay-ai.onrender.com/api/zapier/webhook"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", host: "agentpay-ai.onrender.com" },
+      body: JSON.stringify({
+        event: "PAYPAL_ORDER_CAPTURED",
+        webhookUrl: "http://169.254.169.254/latest/meta-data/",
+        payload: {},
+      }),
+    });
+    const ssrfRes = await zapierWebhookRoute(ssrfReq);
+    expect(ssrfRes.status).toBe(400);
   });
 });
 

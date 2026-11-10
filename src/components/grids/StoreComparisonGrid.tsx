@@ -151,6 +151,10 @@ export function StoreComparisonGrid({ quotes }: StoreComparisonGridProps) {
   const handleExportCsv = () => {
     gridRef.current?.api?.exportDataAsCsv({
       fileName: "agentpay-store-comparison.csv",
+      processCellCallback: (params) => {
+        const raw = String(params.value ?? "");
+        return /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
+      },
     });
   };
 

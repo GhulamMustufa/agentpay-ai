@@ -1,10 +1,10 @@
-# ⚡ AgentPay AI
+# <img src="./public/logo.png" alt="AgentPay AI logo" width="32" height="32" align="absmiddle" /> AgentPay AI
 
 > **The smart AI shopping assistant that checks prices, catches hidden fees, and asks for your 1-click approval before paying with PayPal.**
 
 [![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-blue)](http://localhost:3000)
 [![PayPal Integration](https://img.shields.io/badge/PayPal-Orders%20v2-emerald)](./SPONSORS.md)
-[![Tests](https://img.shields.io/badge/Tests-26%20Passing-purple)](./src/lib/__tests__)
+[![Tests](https://img.shields.io/badge/Tests-43%20Unit%20%7C%206%20E2E-purple)](./src/lib/__tests__)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ---
@@ -56,24 +56,28 @@ npm run dev
 ## 🧪 Automated Tests
 
 ```bash
-# Run unit tests (All 26 tests pass in < 800ms)
+# Run unit & integration tests (43/43 tests pass in ~1s)
 npm test
 
-# Run live edge-case suite (Real PayPal Sandbox & Gemini tests)
+# Run live sponsor & API edge-case suite (7/7 live checks)
 npm run test:edge
+
+# Run Playwright real-browser E2E suite (6/6 scenarios)
+npm run test:e2e
 ```
 
 ---
 
 ## 🛠️ How It's Built
 
-- **Frontend & UI:** Next.js 15, React 19, Tailwind CSS (Comfortable Soft Charcoal Dark & Soft Light themes).
+- **Frontend & UI:** Next.js 15, React 19, Tailwind CSS (Soft Charcoal Dark & Soft Light themes), and custom brand identity.
 - **Payment Engine:** PayPal Developer Platform (Orders v2 API `/v2/checkout/orders` with automated capture).
-- **AI Sourcing:** Google Gemini 3.5 Flash neural extraction via direct REST v1beta.
+- **Sponsor Infrastructure:** Channel3 catalog search (`src/lib/integrations/sponsors.ts`), Elastic hybrid BM25/Elasticsearch ranking, APIMatic OpenAPI schema guard, AG Grid interactive tables (`src/components/grids/`), Zapier Catch Hook alerts (`/api/zapier/webhook`), Postman collection, and Render deployment blueprint (`render.yaml`).
+- **AI Sourcing:** Google Gemini Flash neural extraction via direct REST v1beta.
 - **3-Agent Helpers:** Store Searcher (catalog & specs), Fee Inspector (guardrail policy), Safe Checkout (PayPal capture).
 - **Safety Protocol:** Model Context Protocol (MCP) server running at `/api/mcp`.
-- **Audit Ledger:** Persistent local ledger tracking purchases and money saved from markups.
-- **API Tests:** Ready-to-import Postman test collection in `postman/paypal-ai-collection.json`.
+- **Audit Ledger & Hybrid DB:** Neon Serverless Postgres primary persistence (`src/lib/db.ts`, `/api/ledger`, `/api/policy`) paired with instant write-through `localStorage` caching, circuit breaker protection, and offline-queue reconciliation.
+- **Testing & Health:** 43 Vitest tests (`npm test`), 7 live sponsor checks (`npm run test:edge`), 6 Playwright Chrome E2E tests (`npm run test:e2e`), and `/api/health`.
 
 ---
 

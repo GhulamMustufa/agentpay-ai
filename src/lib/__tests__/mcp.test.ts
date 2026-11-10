@@ -107,4 +107,28 @@ describe("PayPal Commerce MCP Server", () => {
     const captureData = JSON.parse(captureRes.result!.content![0].text);
     expect(captureData.status.toLowerCase()).toBe("completed");
   });
+
+  it("blocks unverified overrideToken bypasses and malformed capture approval tokens", async () => {
+    const fakeOverride = await handleMCPRequest({
+      jsonrpc: "2.0",
+      id: 5,
+      method: "tools/call",
+      params: {
+        name: "paypal_create_order",
+        arguments: { productId: "c3-prod-101", amount: 949.0, budgetCap: 900.0, overrideToken: "fake_bypass" },
+      },
+    });
+    expect(fakeOverride.error?.code).toBe(-32001);
+
+    const badCapture = await handleMCPRequest({
+      jsonrpc: "2.0",
+      id: 6,
+      method: "tools/call",
+      params: {
+        name: "paypal_capture_order",
+        arguments: { orderId: "ORD-123", approvalToken: "bad" },
+      },
+    });
+    expect(badCapture.error?.code).toBe(-32602);
+  });
 });

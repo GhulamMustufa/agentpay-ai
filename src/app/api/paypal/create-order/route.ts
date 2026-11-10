@@ -5,9 +5,9 @@ import { APIMatic } from "@/lib/integrations/sponsors";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { amount, currency = "USD", description = "AgentPay Purchase", clientId, clientSecret, environment } = body;
+    const { amount, currency = "USD", description = "AgentPay Purchase", requestId, clientId, clientSecret, environment } = body;
 
-    if (typeof amount !== "number" || amount <= 0) {
+    if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json(
         { error: "Invalid amount. Must be a positive number." },
         { status: 400 }
@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       amount,
       currency: String(currency).toUpperCase(),
       description: String(description).slice(0, 127),
+      requestId: typeof requestId === "string" && requestId.trim() ? requestId.trim().slice(0, 64) : undefined,
     });
 
     return NextResponse.json({

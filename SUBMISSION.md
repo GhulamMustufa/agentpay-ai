@@ -44,9 +44,9 @@ That vision is **AgentPay AI**.
 - **3-Agent Helpers:** Specialized helpers (Store Searcher, Fee Inspector, and Safe Checkout) collaborating in sequence.
 - **Product Search:** Semantic vector search and multi-vendor catalog adapters (`src/lib/integrations/sponsors.ts`).
 - **Safety Protocol:** Standard Model Context Protocol (MCP) server at `/api/mcp` with live tool testing.
-- **Audit & Savings Ledger:** Persistent ledger tracking transactions and prevented overcharges.
+- **Audit & Savings Ledger:** Hybrid persistence powered by Neon Serverless Postgres (`/api/ledger`, `/api/policy`) paired with an instant `localStorage` fallback & offline-sync queue so judge telemetry never fails offline or on cold DB restarts.
 - **Frontend & Design:** Next.js 15, React 19, Tailwind CSS with an eye-comfortable Soft Charcoal dark theme and soft light theme.
-- **Testing:** 26 automated unit tests passing in < 800ms (`npm test`), 4 live edge-case tests, plus Postman test collection in `postman/paypal-ai-collection.json`.
+- **Testing:** 43 automated unit & integration tests passing in ~1s (`npm test`), 7 live API/sponsor checks (`npm run test:edge`), 6 real-browser Playwright Chrome E2E scenarios (`npm run test:e2e`), plus Postman collection in `postman/paypal-ai-collection.json`.
 
 ---
 
@@ -60,7 +60,7 @@ That vision is **AgentPay AI**.
 ### Accomplishments We're Proud Of
 - **Live Overcharge Protection**: Successfully demonstrating the AI stopping sneakily inflated quotes live on screen and saving user money.
 - **1-Click Guest Mode**: Judges can test the full shopping and payment flow with zero setup or login friction.
-- **26 Passing Test Suites**: 100% passing tests verifying payment safety, guardrail policy enforcement, sponsor integrations, live API routes, and non-shopping prompts.
+- **43 Passing Unit Tests + 6 Playwright Chrome E2E + 7 Live Sponsor Checks**: Full automated verification covering payment safety, guardrail policy enforcement, Neon + `localStorage` failover, sponsor integrations, live API routes, and non-shopping/injection prompts.
 - **PayPal & Gemini Live Integration**: Direct network connectivity with official PayPal Sandbox (`api-m.sandbox.paypal.com`) and Google AI Studio.
 
 ---

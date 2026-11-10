@@ -1,0 +1,27 @@
+name: Render Keep-Alive & Health Probe
+
+on:
+  schedule:
+    # Ping every 12 minutes so Render Free Web Service stays warm (< 15m idle sleep)
+    - cron: "*/12 * * * *"
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    if: vars.RENDER_KEEPALIVE_ENABLED != 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render /api/health endpoint
+        env:
+          TARGET_URL: ${{ vars.RENDER_HEALTH_URL || 'https://agentpay-ai.onrender.com/api/health' }}
+        run: |
+          echo "Probing $TARGET_URL ..."
+          RESPONSE=$(curl -sS -m 60 -w "\nHTTP_STATUS:%{http_code}\nTIME_TOTAL:%{time_total}" "$TARGET_URL" || true)
+          echo "$RESPONSE"
+          STATUS=$(printf '%s\n' "$RESPONSE" | awk -F: '/^HTTP_STATUS:/{print $2}')
+          if [ "$STATUS" = "200" ]; then
+            echo "Render service warm and healthy."
+          else
+            echo "::notice::Render service responded with HTTP ${STATUS:-unreachable} (normal before initial Render Blueprint deploy)."
+          fi
+

@@ -4,7 +4,7 @@
  * and records completed transactions into the persistent ledger.
  */
 
-import { addLedgerRecord, LedgerRecord } from "@/lib/storage/ledger";
+import { saveLedgerRecordWithSync, LedgerRecord, PersistenceMode } from "@/lib/storage/ledger";
 
 export interface SettlementResult {
   success: boolean;
@@ -14,6 +14,7 @@ export interface SettlementResult {
   paidAmount: number;
   approvalUrl?: string;
   latencyMs: number;
+  storageMode: PersistenceMode;
   ledgerRecord: LedgerRecord;
 }
 
@@ -74,9 +75,10 @@ export class PayPalSettlementAgent {
     }
 
     const captureStatus = captureData.capture?.status?.toUpperCase() || "COMPLETED";
+    const resolvedApprovalUrl = approvalUrl || captureData.capture?.approvalUrl;
 
-    // 3. Persist transaction into Ledger
-    const ledgerRecord = addLedgerRecord({
+    // 3. Persist transaction into Ledger (localStorage write-through + Neon Postgres sync)
+    const { ledgerRecord, storageMode } = await saveLedgerRecordWithSync({
       prompt: params.userPrompt,
       item: params.item,
       merchant: params.vendor,
@@ -84,11 +86,13 @@ export class PayPalSettlementAgent {
       moneySaved: params.moneySaved,
       paypalOrderId: orderId,
       status: "COMPLETED",
-      receiptUrl: approvalUrl,
+      receiptUrl: resolvedApprovalUrl,
       agentAuditTrail: [
         ...params.auditLogs,
         `💳 Safe Checkout: Created PayPal Order #${orderId} on ${isLive ? "api-m.sandbox.paypal.com" : "PayPal Sandbox"}.`,
-        `💳 Safe Checkout: Payment confirmed successfully via PayPal in ${latencyMs}ms. Status: ${captureStatus}.`,
+        captureStatus === "APPROVED"
+          ? `💳 Safe Checkout: Verified PayPal Sandbox Order #${orderId} in ${latencyMs}ms (Status: APPROVED — checkout link saved in ledger).`
+          : `💳 Safe Checkout: Payment confirmed successfully via PayPal in ${latencyMs}ms. Status: ${captureStatus}.`,
       ],
     });
 
@@ -100,6 +104,7 @@ export class PayPalSettlementAgent {
       paidAmount: params.amount,
       approvalUrl,
       latencyMs,
+      storageMode,
       ledgerRecord,
     };
   }

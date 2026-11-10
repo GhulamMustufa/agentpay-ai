@@ -2,6 +2,7 @@ export interface PaymentOrderRequest {
   amount: number;
   currency: string;
   description: string;
+  requestId?: string;
   metadata?: Record<string, any>;
 }
 
