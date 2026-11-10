@@ -143,6 +143,26 @@
           "path": ["api", "mcp"]
         }
       }
+    },
+    {
+      "name": "8. AgentPay Zapier Webhook Alert",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"event\": \"POLICY_OVERCHARGE_BLOCKED\",\n  \"payload\": {\n    \"vendor\": \"CloudTech Supply\",\n    \"quotedAmount\": 949.00,\n    \"budgetCap\": 900.00,\n    \"blockedMarkup\": 100.00\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/zapier/webhook",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "zapier", "webhook"]
+        }
+      }
     }
   ]
 }

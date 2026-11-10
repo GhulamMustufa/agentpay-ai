@@ -1,4 +1,5 @@
 import { PaymentGateway, PaymentOrderRequest, PaymentOrderResponse } from "./types";
+import { APIMatic } from "../integrations/sponsors";
 
 export class PayPalPaymentGateway implements PaymentGateway {
   name = "PayPal Developer Platform (Sandbox & Live)";
@@ -10,7 +11,7 @@ export class PayPalPaymentGateway implements PaymentGateway {
   constructor(creds?: { clientId?: string; clientSecret?: string; environment?: "sandbox" | "live" }) {
     this.clientId = creds?.clientId || process.env.PAYPAL_CLIENT_ID;
     this.clientSecret = creds?.clientSecret || process.env.PAYPAL_CLIENT_SECRET;
-    const env = creds?.environment || process.env.PAYPAL_ENVIRONMENT || "sandbox";
+    const env = creds?.environment || process.env.PAYPAL_ENVIRONMENT || process.env.PAYPAL_MODE || "sandbox";
     this.baseUrl = env === "live"
       ? "https://api-m.paypal.com"
       : "https://api-m.sandbox.paypal.com";
@@ -38,13 +39,31 @@ export class PayPalPaymentGateway implements PaymentGateway {
   }
 
   async createOrder(req: PaymentOrderRequest): Promise<PaymentOrderResponse> {
+    const orderPayload = {
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          amount: {
+            currency_code: (req.currency || "USD").toUpperCase(),
+            value: req.amount.toFixed(2),
+          },
+          description: (req.description || "AgentPay Order").slice(0, 127),
+        },
+      ],
+    };
+
+    const validation = APIMatic.validatePayPalOrderPayload(orderPayload);
+    if (!validation.valid) {
+      throw new Error(`APIMatic Schema Validation Failed: ${validation.errors.join("; ")}`);
+    }
+
     if (!this.clientId) {
       // Graceful fallback to sandbox mock
       return {
         id: `paypal-sim-${Date.now()}`,
         status: "created",
         amount: req.amount,
-        currency: req.currency,
+        currency: orderPayload.purchase_units[0].amount.currency_code,
         approvalUrl: "https://www.sandbox.paypal.com/checkoutnow",
       };
     }
@@ -56,18 +75,7 @@ export class PayPalPaymentGateway implements PaymentGateway {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        intent: "CAPTURE",
-        purchase_units: [
-          {
-            amount: {
-              currency_code: req.currency,
-              value: req.amount.toFixed(2),
-            },
-            description: req.description,
-          },
-        ],
-      }),
+      body: JSON.stringify(orderPayload),
     });
     const data = await res.json();
     const approveLink = data.links?.find((l: any) => l.rel === "approve")?.href;

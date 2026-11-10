@@ -50,7 +50,7 @@ Runs tests across payment gateway logic, policy checks, and MCP server endpoints
 ```bash
 npm test
 ```
-*Expected Result: 21/21 passing tests in < 700ms.*
+*Expected Result: 26/26 passing tests in < 800ms.*
 
 ### 2. Live API Edge-Case Tests
 Runs live tests against real PayPal Sandbox and Google Gemini endpoints verifying non-shopping queries, unrealistic low budgets, prompt injection resistance, and order lifecycles:

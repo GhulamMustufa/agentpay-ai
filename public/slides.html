@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AgentPay AI - Pitch Deck | PayPal AI Hackathon 2026</title>
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="shortcut icon" href="/favicon.ico">
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -53,9 +55,7 @@
   <!-- TOP HEADER / PROGRESS -->
   <header class="w-full flex items-center justify-between z-20">
     <div class="flex items-center space-x-3">
-      <div class="w-9 h-9 rounded-xl badge-paypal flex items-center justify-center font-bold text-white shadow-lg text-lg">
-        P
-      </div>
+      <img src="/logo.png" alt="AgentPay AI logo" class="w-9 h-9 rounded-xl shadow-lg object-contain shrink-0">
       <div>
         <div class="text-sm font-bold tracking-tight text-white flex items-center gap-2">
           AgentPay AI
@@ -227,7 +227,7 @@
           <div class="text-3xl font-extrabold text-cyan-500/40 mb-2 font-mono-code">03</div>
           <h3 class="text-lg font-semibold text-white mb-2">PayPal Checkout</h3>
           <p class="text-slate-300 text-sm leading-relaxed">
-            If approved, a 1-time virtual card executes via PayPal Sandbox. Full receipt logged to your dashboard.
+            After 1-click human approval, an APIMatic-verified PayPal Orders v2 transaction settles via Sandbox and emits a Zapier alert.
           </p>
         </div>
       </div>
@@ -299,7 +299,7 @@
         <div class="glass-card p-6 rounded-2xl border-slate-700">
           <div class="text-2xl font-bold text-cyan-400 mb-2">Zero Merchant Friction</div>
           <p class="text-slate-300 text-sm leading-relaxed">
-            Stores don't have to rewrite their websites. The virtual card matches standard PayPal / Mastercard protocols everywhere online.
+            Merchants use standard PayPal Orders v2 checkout rails while Channel3, Elastic, and AG Grid normalize cross-store pricing.
           </p>
         </div>
 
@@ -319,17 +319,17 @@
       </div>
       <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-4">Fully Built & Tested.</h2>
       <p class="text-base md:text-lg text-slate-300 mb-8 max-w-xl">
-        We built the full dashboard, policy enforcement engine, and PayPal integration with 21 passing automated tests.
+        We built the full dashboard, policy enforcement engine, and PayPal integration with 26 passing automated tests.
       </p>
 
       <div class="w-full glass-card p-5 rounded-2xl border-slate-700 mb-8 text-left space-y-3 font-mono-code text-xs">
         <div class="flex justify-between items-center text-slate-300">
-          <span>✓ Next.js 14 Production Dashboard</span>
+          <span>✓ Next.js 15 + AG Grid Production Dashboard</span>
           <span class="text-emerald-400 font-bold">ONLINE (:3000)</span>
         </div>
         <div class="flex justify-between items-center text-slate-300">
           <span>✓ Automated Test Suite</span>
-          <span class="text-emerald-400 font-bold">21 / 21 PASSING</span>
+          <span class="text-emerald-400 font-bold">26 / 26 PASSING</span>
         </div>
         <div class="flex justify-between items-center text-slate-300">
           <span>✓ Policy Engine & Anomaly Detection</span>
@@ -463,7 +463,7 @@
           <div class="text-slate-300">&gt; Request: <span class="text-cyan-400">Buy $15.00 GitHub Copilot API</span></div>
           <div class="text-slate-400">&gt; Checking budget ($15.00 &lt;= $50.00)... <span class="text-emerald-400 font-bold">OK</span></div>
           <div class="text-slate-400">&gt; Checking merchant 'github.com'... <span class="text-emerald-400 font-bold">WHITELISTED</span></div>
-          <div class="text-emerald-400 font-bold mt-1">&gt; APPROVED! Generated 1-time virtual card [4111-xxxx-xxxx-8921]. PayPal payment executed.</div>
+          <div class="text-emerald-400 font-bold mt-1">&gt; APPROVED! APIMatic validated payload. PayPal Orders v2 payment executed in 312ms.</div>
         `;
         badge.className = "px-2 py-0.5 rounded text-[11px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold";
         badge.innerText = "TRANSACTION APPROVED (200)";
@@ -472,7 +472,7 @@
           <div class="text-slate-300">&gt; Request: <span class="text-red-400 font-bold">Buy $450.00 GPU Cloud Instance</span></div>
           <div class="text-red-400">&gt; Checking budget ($450.00 &gt; $50.00 limit)... <span class="font-bold underline">FAILED</span></div>
           <div class="text-amber-400">&gt; Anomaly score: 98% (Exceeds agent single-transaction allowance)</div>
-          <div class="text-red-400 font-bold mt-1">&gt; BLOCKED! Zero funds sent. Alert dispatched to team Slack & Dashboard.</div>
+          <div class="text-red-400 font-bold mt-1">&gt; BLOCKED! Zero funds sent. Zapier alert dispatched to team Slack & Dashboard.</div>
         `;
         badge.className = "px-2 py-0.5 rounded text-[11px] bg-red-500/20 text-red-400 border border-red-500/30 font-bold";
         badge.innerText = "OVERCHARGE BLOCKED (403)";
@@ -481,7 +481,7 @@
           <div class="text-slate-300">&gt; Request: <span class="text-amber-400">Checkout at 'unverified-crypto-roll.xyz' ($10.00)</span></div>
           <div class="text-slate-400">&gt; Checking budget ($10.00 &lt;= $50.00)... OK</div>
           <div class="text-amber-400">&gt; Checking merchant whitelist... <span class="font-bold underline">NOT FOUND</span></div>
-          <div class="text-amber-400 font-bold mt-1">&gt; FROZEN! Unapproved merchant category. Virtual card creation denied.</div>
+          <div class="text-amber-400 font-bold mt-1">&gt; FROZEN! Unapproved merchant category. PayPal checkout denied.</div>
         `;
         badge.className = "px-2 py-0.5 rounded text-[11px] bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold";
         badge.innerText = "MERCHANT NOT ALLOWED (403)";

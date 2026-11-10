@@ -36,10 +36,10 @@
 ## 📅 Sprint Milestones (8-Day Fast Cash Cadence)
 
 - [x] **Day 1 (Nov 4)**: Initialize sprint workspace, architecture, and PayPal sandbox mock adapters.
-- [ ] **Day 2 (Nov 5)**: Wire multimodal invoice extraction & vendor price-parity check logic.
-- [ ] **Day 3 (Nov 6)**: Connect PayPal Sandbox Orders & Invoicing API endpoints.
-- [ ] **Day 4 (Nov 7)**: Complete dark/light dashboard UI, live telemetry terminal & receipt generator.
-- [ ] **Day 5 (Nov 8)**: Deploy live HTTPS URL on Vercel with 1-Click Guest Demo Bypass.
-- [ ] **Day 6 (Nov 9)**: Verify automated Playwright E2E and unit test suites.
-- [ ] **Day 7 (Nov 10)**: Record 120-second demo video using timestamped script ([video/SCRIPT.md](./video/SCRIPT.md)).
+- [x] **Day 2 (Nov 5)**: Wire multimodal invoice extraction & vendor price-parity check logic.
+- [x] **Day 3 (Nov 6)**: Connect PayPal Sandbox Orders & Invoicing API endpoints.
+- [x] **Day 4 (Nov 7)**: Complete dark/light dashboard UI, live telemetry terminal & receipt generator.
+- [ ] **Day 5 (Nov 8)**: Deploy live HTTPS URL on Render/Vercel with 1-Click Guest Demo Bypass.
+- [x] **Day 6 (Nov 9)**: Verify automated unit & sponsor integration test suites (26/26 passing) and update Playwright E2E selectors.
+- [ ] **Day 7 (Nov 10)**: Record 120–150s demo video using updated script ([video/SCRIPT.md](./video/SCRIPT.md)).
 - [ ] **Day 8 (Nov 11 - 24h Early)**: Complete Devpost submission form and publish!

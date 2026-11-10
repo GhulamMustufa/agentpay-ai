@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { handleMCPRequest, MCP_TOOLS } from "../mcp/server";
+import { handleMCPRequest } from "../mcp/server";
 
 describe("PayPal Commerce MCP Server", () => {
   it("should expose all 5 standardized commerce tools", async () => {
@@ -9,8 +9,9 @@ describe("PayPal Commerce MCP Server", () => {
       method: "tools/list",
     });
 
-    expect(res.result.tools).toHaveLength(5);
-    const toolNames = res.result.tools.map((t: any) => t.name);
+    expect(res.result).toBeDefined();
+    expect(res.result!.tools).toHaveLength(5);
+    const toolNames = res.result!.tools!.map((t: any) => t.name);
     expect(toolNames).toContain("paypal_search_catalog");
     expect(toolNames).toContain("paypal_audit_spec_parity");
     expect(toolNames).toContain("paypal_check_purchase_policy");
@@ -27,17 +28,18 @@ describe("PayPal Commerce MCP Server", () => {
         name: "paypal_check_purchase_policy",
         arguments: {
           vendorName: "CloudTech Distro",
-          quotedAmount: 949.00,
-          budgetCap: 900.00,
-          unapprovedMarkup: 100.00,
+          quotedAmount: 949.0,
+          budgetCap: 900.0,
+          unapprovedMarkup: 100.0,
         },
       },
     });
 
-    const parsed = JSON.parse(res.result.content[0].text);
+    expect(res.result?.content?.[0]?.text).toBeDefined();
+    const parsed = JSON.parse(res.result!.content![0].text);
     expect(parsed.compliant).toBe(false);
     expect(parsed.action).toBe("HALT_PAYMENT");
-    expect(parsed.violationDetails.overageAmount).toBe(49.00);
+    expect(parsed.violationDetails.overageAmount).toBe(49.0);
   });
 
   it("should reject order creation if exceeding budget cap without override token", async () => {
@@ -49,15 +51,15 @@ describe("PayPal Commerce MCP Server", () => {
         name: "paypal_create_order",
         arguments: {
           productId: "c3-prod-overpriced",
-          amount: 949.00,
-          budgetCap: 900.00,
+          amount: 949.0,
+          budgetCap: 900.0,
         },
       },
     });
 
     expect(res.error).toBeDefined();
-    expect(res.error.code).toBe(-32001);
-    expect(res.error.message).toContain("PolicyViolation");
+    expect(res.error!.code).toBe(-32001);
+    expect(res.error!.message).toContain("PolicyViolation");
   });
 
   it("should execute paypal_search_catalog tool call via Channel3 and Elastic", async () => {
@@ -72,8 +74,8 @@ describe("PayPal Commerce MCP Server", () => {
     });
 
     expect(res.error).toBeUndefined();
-    expect(res.result.content[0].type).toBe("text");
-    const parsed = JSON.parse(res.result.content[0].text);
+    expect(res.result?.content?.[0]?.type).toBe("text");
+    const parsed = JSON.parse(res.result!.content![0].text);
     expect(parsed.totalFound).toBeGreaterThan(0);
     expect(parsed.topCandidate.name).toBe("Dell XPS 13 Developer Edition");
   });
@@ -85,11 +87,11 @@ describe("PayPal Commerce MCP Server", () => {
       method: "tools/call",
       params: {
         name: "paypal_create_order",
-        arguments: { productId: "c3-prod-101", amount: 849.00 },
+        arguments: { productId: "c3-prod-101", amount: 849.0 },
       },
     });
 
-    const createData = JSON.parse(createRes.result.content[0].text);
+    const createData = JSON.parse(createRes.result!.content![0].text);
     expect(createData.orderId).toBeDefined();
 
     const captureRes = await handleMCPRequest({
@@ -102,7 +104,7 @@ describe("PayPal Commerce MCP Server", () => {
       },
     });
 
-    const captureData = JSON.parse(captureRes.result.content[0].text);
+    const captureData = JSON.parse(captureRes.result!.content![0].text);
     expect(captureData.status.toLowerCase()).toBe("completed");
   });
 });

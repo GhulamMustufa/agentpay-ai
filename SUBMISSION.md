@@ -46,7 +46,7 @@ That vision is **AgentPay AI**.
 - **Safety Protocol:** Standard Model Context Protocol (MCP) server at `/api/mcp` with live tool testing.
 - **Audit & Savings Ledger:** Persistent ledger tracking transactions and prevented overcharges.
 - **Frontend & Design:** Next.js 15, React 19, Tailwind CSS with an eye-comfortable Soft Charcoal dark theme and soft light theme.
-- **Testing:** 21 automated unit tests passing in < 700ms (`npm test`), 4 live edge-case tests, plus Postman test collection in `postman/paypal-ai-collection.json`.
+- **Testing:** 26 automated unit tests passing in < 800ms (`npm test`), 4 live edge-case tests, plus Postman test collection in `postman/paypal-ai-collection.json`.
 
 ---
 
@@ -60,7 +60,7 @@ That vision is **AgentPay AI**.
 ### Accomplishments We're Proud Of
 - **Live Overcharge Protection**: Successfully demonstrating the AI stopping sneakily inflated quotes live on screen and saving user money.
 - **1-Click Guest Mode**: Judges can test the full shopping and payment flow with zero setup or login friction.
-- **21 Passing Test Suites**: 100% passing tests verifying payment safety, guardrail policy enforcement, live API routes, and non-shopping prompts.
+- **26 Passing Test Suites**: 100% passing tests verifying payment safety, guardrail policy enforcement, sponsor integrations, live API routes, and non-shopping prompts.
 - **PayPal & Gemini Live Integration**: Direct network connectivity with official PayPal Sandbox (`api-m.sandbox.paypal.com`) and Google AI Studio.
 
 ---

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -40,7 +41,15 @@ export default function DocsPage() {
               <ArrowLeft className="w-4 h-4 mr-1" /> Home
             </Button>
           </Link>
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <Image
+              src="/logo.png"
+              alt="AgentPay AI logo"
+              width={28}
+              height={28}
+              priority
+              className="w-7 h-7 rounded-md shadow-sm shrink-0"
+            />
             <BookOpen className="w-4 h-4 text-primary shrink-0" />
             <span className="font-semibold text-sm sm:text-base text-foreground">Documentation</span>
           </div>
@@ -391,20 +400,20 @@ npm run dev
                   <p className="text-muted-foreground leading-relaxed font-normal">
                     Direct connection with official PayPal Orders API to create and complete payments safely in seconds.
                   </p>
-                  <code className="text-[10px] text-primary block mt-1 font-mono">File: src/lib/payments/paypal.ts:13-92</code>
+                  <code className="text-[10px] text-primary block mt-1 font-mono">File: src/lib/payments/paypal.ts:3-121</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-foreground text-sm flex items-center gap-1.5">
-                      🔍 Elastic Vector Search
+                      🔍 Elastic Hybrid Search
                     </span>
                     <Badge variant="outline" className="text-[10px]">Search Engine</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Finds the best matching products from store catalogs by comparing specifications, features, and budget.
+                    Ranks store products via Elasticsearch cluster queries or hybrid BM25 token and spec scoring.
                   </p>
-                  <code className="text-[10px] text-emerald-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:70-76</code>
+                  <code className="text-[10px] text-emerald-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:173-246</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -415,9 +424,9 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">Catalog API</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Gathers multi-store prices, specifications, and live stock availability.
+                    Queries Channel3 normalized product API (with curated fallback) for live prices and specifications.
                   </p>
-                  <code className="text-[10px] text-purple-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:25-67</code>
+                  <code className="text-[10px] text-purple-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:40-171</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -428,35 +437,35 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">API Schemas</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Gives the AI clear rules and strict blueprints so it never makes formatting mistakes or invalid payment requests.
+                    Injects PayPal Orders v2 OpenAPI contracts into prompts and validates every order payload before dispatch.
                   </p>
-                  <code className="text-[10px] text-blue-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:79-90</code>
+                  <code className="text-[10px] text-blue-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:248-326</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-foreground text-sm flex items-center gap-1.5">
-                      📊 AG Grid Tables
+                      📊 AG Grid Enterprise Data Grids
                     </span>
                     <Badge variant="outline" className="text-[10px]">Data Grid</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Clean, easy-to-read comparison table on your dashboard showing prices, shipping fees, and store ratings.
+                    Interactive React data grids with sorting, quick filtering, and CSV export for store quotes and ledger history.
                   </p>
-                  <code className="text-[10px] text-foreground block mt-1 font-mono">File: src/app/dashboard/page.tsx:320-370</code>
+                  <code className="text-[10px] text-cyan-400 block mt-1 font-mono">File: src/components/grids/StoreComparisonGrid.tsx:1-204</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-foreground text-sm flex items-center gap-1.5">
-                      ⏱️ Bryntum Timeline
+                      ⚡ Zapier Webhook Automation
                     </span>
-                    <Badge variant="outline" className="text-[10px]">Progress</Badge>
+                    <Badge variant="outline" className="text-[10px]">Workflows</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Visual step-by-step progress tracker that shows you what the AI is doing in real time.
+                    Dispatches real-time Catch Hook alerts when hidden fees are blocked or PayPal orders are captured.
                   </p>
-                  <code className="text-[10px] text-foreground block mt-1 font-mono">File: src/app/dashboard/page.tsx:210-230</code>
+                  <code className="text-[10px] text-amber-400 block mt-1 font-mono">File: src/lib/integrations/sponsors.ts:328-380</code>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-1.5">
@@ -480,9 +489,9 @@ npm run dev
                     <Badge variant="outline" className="text-[10px]">Deployment</Badge>
                   </div>
                   <p className="text-muted-foreground leading-relaxed font-normal">
-                    Cloud deployment file to launch this app online in minutes with 1 click.
+                    Cloud deployment blueprint to launch this app online with zero configuration.
                   </p>
-                  <code className="text-[10px] text-rose-400 block mt-1 font-mono">File: render.yaml:1-16</code>
+                  <code className="text-[10px] text-rose-400 block mt-1 font-mono">File: render.yaml:1-28</code>
                 </div>
               </div>
             </div>

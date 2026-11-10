@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PayPalPaymentGateway } from "@/lib/payments/paypal";
+import { APIMatic } from "@/lib/integrations/sponsors";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,23 +14,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const schemaCheck = APIMatic.validatePayPalOrderPayload({
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          amount: {
+            currency_code: String(currency).toUpperCase(),
+            value: amount.toFixed(2),
+          },
+          description: String(description).slice(0, 127),
+        },
+      ],
+    });
+
+    if (!schemaCheck.valid) {
+      return NextResponse.json(
+        { error: `APIMatic Schema Error: ${schemaCheck.errors.join("; ")}` },
+        { status: 400 }
+      );
+    }
+
     const gateway = new PayPalPaymentGateway({
       clientId: clientId || process.env.PAYPAL_CLIENT_ID,
       clientSecret: clientSecret || process.env.PAYPAL_CLIENT_SECRET,
-      environment: environment || (process.env.PAYPAL_ENVIRONMENT as any) || "sandbox",
+      environment: environment || (process.env.PAYPAL_ENVIRONMENT as any) || (process.env.PAYPAL_MODE as any) || "sandbox",
     });
 
     const isLive = gateway.isLiveConfigured();
     const order = await gateway.createOrder({
       amount,
-      currency,
-      description,
+      currency: String(currency).toUpperCase(),
+      description: String(description).slice(0, 127),
     });
 
     return NextResponse.json({
       success: true,
       isLive,
       mode: isLive ? "paypal_sandbox_live" : "paypal_sandbox_simulated",
+      schemaVerified: schemaCheck.valid,
+      schemaContract: schemaCheck.contract,
       order,
     });
   } catch (err: any) {

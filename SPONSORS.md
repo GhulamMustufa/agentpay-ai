@@ -1,22 +1,21 @@
 # 🔌 Sponsor Technologies & Integration Matrix: PayPal AI Hackathon
 
-This project implements and highlights integrations with the official hackathon sponsors, demonstrating verified technical use cases across the codebase.
+This project implements verified, testable integrations with official hackathon sponsors—every entry below maps to live code in the repository.
 
 ---
 
-## Complete Sponsor Integration Matrix
+## Verified Sponsor Integration Matrix
 
 | Sponsor Tool | Primary Capability | Where It Powers AgentPay | Verifiable Code Reference |
 | :--- | :--- | :--- | :--- |
-| **PayPal** | Payments & Checkout Infrastructure | Core autonomous settlement via Orders v2 API & OAuth2 | [`src/lib/payments/paypal.ts:13-92`](file:///src/lib/payments/paypal.ts) |
-| **Channel3** | Product Data & Catalog API | Powers autonomous product discovery for shopping prompts | [`src/lib/integrations/sponsors.ts:25-67`](file:///src/lib/integrations/sponsors.ts) |
-| **Elastic** | Search & Vector Retrieval | Vector semantic ranking and spec similarity matching | [`src/lib/integrations/sponsors.ts:70-76`](file:///src/lib/integrations/sponsors.ts) |
-| **APIMatic** | API Documentation & Context | Provides validated schemas preventing LLM hallucination | [`src/lib/integrations/sponsors.ts:79-90`](file:///src/lib/integrations/sponsors.ts) |
-| **AG Grid** | Advanced Data Grids | Interactive product spec and multi-vendor comparison table | [`src/app/dashboard/page.tsx:210-245`](file:///src/app/dashboard/page.tsx) |
-| **Bryntum** | Scheduling & Timeline Components | Order lifecycle timeline (Discovery $\to$ Approval $\to$ Delivery) | [`src/app/dashboard/page.tsx:250-280`](file:///src/app/dashboard/page.tsx) |
-| **Render** | Cloud Hosting & Infrastructure | 1-Click deployment blueprint with zero-downtime builds | [`render.yaml:1-16`](file:///render.yaml) |
-| **Postman** | API Development & Testing | Complete test collection verifying PayPal Sandbox endpoints | [`postman/paypal-ai-collection.json`](file:///postman/paypal-ai-collection.json) |
-| **Astropods & KERNEL** | Agent Infrastructure & Sandbox | Agent runtime execution and sandboxed verification | [`src/lib/integrations/sponsors.ts:93-103`](file:///src/lib/integrations/sponsors.ts) |
+| **PayPal** | Payments & Checkout Infrastructure | Orders v2 creation, OAuth2 auth, and capture settlement | [`src/lib/payments/paypal.ts:3-121`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/lib/payments/paypal.ts#L3-L121) |
+| **Channel3** | Product Data & Catalog API | Live Channel3 search connector (`POST api.trychannel3.com/v1/search`) with fallback | [`src/lib/integrations/sponsors.ts:40-171`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/lib/integrations/sponsors.ts#L40-L171) |
+| **AG Grid** | Enterprise Data Grids (`ag-grid-react`) | Sortable, filterable Store Price Comparison & Audit Ledger grids with CSV export | [`src/components/grids/StoreComparisonGrid.tsx`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/components/grids/StoreComparisonGrid.tsx) |
+| **APIMatic** | API Context & Schema Validation | Injects PayPal Orders v2 OpenAPI contract into prompts & validates order payloads | [`src/lib/integrations/sponsors.ts:248-326`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/lib/integrations/sponsors.ts#L248-L326) |
+| **Elastic** | Hybrid Search & Relevance | Elasticsearch cluster search (`ELASTICSEARCH_URL`) + local BM25/spec ranking | [`src/lib/integrations/sponsors.ts:173-246`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/lib/integrations/sponsors.ts#L173-L246) |
+| **Zapier** | Workflow & Webhook Automation | Real-time Catch Hook alerts when hidden fees are blocked or PayPal orders capture | [`src/lib/integrations/sponsors.ts:328-380`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/lib/integrations/sponsors.ts#L328-L380) • [`src/app/api/zapier/webhook/route.ts`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/app/api/zapier/webhook/route.ts) |
+| **Render** | Cloud Hosting & Infrastructure | 1-click deployment blueprint with pre-configured environment variables | [`render.yaml:1-28`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/render.yaml#L1-L28) |
+| **Postman** | API Development & Testing | Turnkey collection verifying PayPal Sandbox endpoints | [`postman/paypal-ai-collection.json`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/postman/paypal-ai-collection.json) |
 
 ---
 
@@ -24,26 +23,24 @@ This project implements and highlights integrations with the official hackathon 
 - **APIs**:
   - `POST /v1/oauth2/token` (OAuth2 token generation)
   - `POST /v2/checkout/orders` (Order provisioning with `intent: "CAPTURE"`)
-  - `POST /v2/checkout/orders/{id}/capture` (Instant autonomous capture)
-- **Integration**: Real-time server-side SDK calls with graceful sandbox fallback for 1-click zero-friction judge evaluation.
+  - `POST /v2/checkout/orders/{id}/capture` (Instant authorized capture)
+- **Integration**: Real-time server-side calls in [`PayPalPaymentGateway`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/lib/payments/paypal.ts#L3-L121) with zero-friction sandbox fallback for 1-click judge evaluation.
 
 ## 2. Channel3 (Product Data API)
-- **Role**: When the user requests a product (e.g. *"Find a programming laptop under $900"*), the agent queries Channel3's product graph to retrieve real-time vendor pricing, stock availability, and manufacturer specs.
+- **Role**: Queries Channel3 (`POST https://api.trychannel3.com/v1/search` with `x-api-key`) in both [`/api/ai/analyze`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/app/api/ai/analyze/route.ts) and the MCP tool `paypal_search_catalog`, falling back gracefully to a curated multi-category catalog when `CHANNEL3_API_KEY` is omitted.
 
-## 3. Elastic (Vector & Hybrid Search)
-- **Role**: Uses vector embeddings to match natural-language user constraints (e.g., *"lightweight for travel"*, *"16GB RAM for Docker"*) against technical catalog attributes.
+## 3. AG Grid (`ag-grid-react` & `ag-grid-community` v36)
+- **Role**: Powers both [`StoreComparisonGrid`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/components/grids/StoreComparisonGrid.tsx) and [`LedgerHistoryGrid`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/components/grids/LedgerHistoryGrid.tsx) with theme-aware dark/light styling, quick search filtering, column sorting, inline policy violation badges, and 1-click CSV export.
 
-## 4. APIMatic (API Context for AI)
-- **Role**: Feeds strictly typed OpenAPI 3.0 contracts into the LLM system prompt so the autonomous agent formulates exact PayPal Orders payload schemas without parameter hallucination.
+## 4. APIMatic (OpenAPI Schema Context & Runtime Guard)
+- **Role**: Provides the PayPal Orders v2 OpenAPI contract (`APIMatic.getPayPalContextPrompt()`) directly inside the Gemini procurement prompt and enforces strict runtime schema validation (`APIMatic.validatePayPalOrderPayload()`) inside both [`PayPalPaymentGateway.createOrder`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/lib/payments/paypal.ts#L42-L60) and the MCP server before any order is dispatched.
 
-## 5. AG Grid & Bryntum (Data Grid & Timelines)
-- **Role**: Powers the visual comparison grid where judges see side-by-side spec scoring, and the visual timeline showing the exact progression of the autonomous transaction.
+## 5. Elastic (Hybrid Search & Relevance Ranking)
+- **Role**: Ranks product candidates from Channel3 against natural-language user prompts using live Elasticsearch `_search` when `ELASTICSEARCH_URL` + `ELASTICSEARCH_API_KEY` are configured, or local BM25-style token + spec relevance scoring in zero-config mode.
 
-## 6. Postman (API Verification)
-- **Role**: Provides a turnkey Postman collection (`postman/paypal-ai-collection.json`) allowing any technical judge to independently test and execute our PayPal API calls with one click.
+## 6. Zapier (Automated Alerts & Reconciliation)
+- **Role**: Dispatches structured JSON webhook events (`POLICY_OVERCHARGE_BLOCKED` and `PAYPAL_ORDER_CAPTURED`) through [`/api/zapier/webhook`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/src/app/api/zapier/webhook/route.ts) so users can route blocked-fee alerts to Slack or log verified PayPal receipts to Google Sheets.
 
-## 7. Render (Cloud Deployment)
-- **Role**: `render.yaml` enables instant 1-click cloud deployment with environment variables and production build workflows pre-configured.
-
-## 8. Astropods & KERNEL (Agent Infrastructure)
-- **Role**: Serves as the agentic orchestrator ensuring tool calls execute safely within an isolated, sandboxed environment with strict audit logs.
+## 7. Postman & Render
+- **Postman**: Ready-to-import test suite in [`postman/paypal-ai-collection.json`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/postman/paypal-ai-collection.json).
+- **Render**: Production blueprint in [`render.yaml`](file:///Users/mac/Desktop/hackathones/active/2026-11-paypal-ai/render.yaml) supporting 1-click deployment.

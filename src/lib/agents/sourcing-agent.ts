@@ -18,6 +18,11 @@ export interface SourcingResult {
   subItems?: { name: string; allocatedBudget: number }[];
   provider: string;
   latencyMs: number;
+  integrations?: {
+    channel3Candidates?: number;
+    elasticTopMatch?: string | null;
+    apimaticSchema?: string;
+  };
 }
 
 export class SourcingAgent {
@@ -78,6 +83,7 @@ export class SourcingAgent {
       subItems,
       provider: data.provider || (data.isLiveLLM ? "Google Gemini 3.5 Flash" : "Dynamic Engine"),
       latencyMs,
+      integrations: data.integrations,
     };
   }
 }

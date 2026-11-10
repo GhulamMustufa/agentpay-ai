@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
@@ -15,9 +16,14 @@ export default function LandingPage() {
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-md px-4 sm:px-6 py-3.5">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-              ⚡
-            </div>
+            <Image
+              src="/logo.png"
+              alt="AgentPay AI logo"
+              width={32}
+              height={32}
+              priority
+              className="w-8 h-8 rounded-lg shadow-sm shrink-0"
+            />
             <span className="font-semibold text-base sm:text-lg text-foreground">
               AgentPay AI
             </span>
@@ -86,12 +92,13 @@ export default function LandingPage() {
             Built with trusted developer tools:
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-foreground/80 font-normal">
-            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">PayPal Orders API</span>
-            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">Elastic Search</span>
+            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">PayPal Orders v2</span>
             <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">Channel3 Catalog</span>
-            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">APIMatic Schemas</span>
             <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">AG Grid Tables</span>
-            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">Postman Tests</span>
+            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">APIMatic Schemas</span>
+            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">Elastic Search</span>
+            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">Zapier Webhooks</span>
+            <span className="px-2.5 py-1 rounded-md bg-muted/50 border border-border">Postman &amp; Render</span>
           </div>
         </div>
 

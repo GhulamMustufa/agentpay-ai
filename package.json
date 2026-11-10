@@ -9,12 +9,15 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:edge": "node scripts/run-live-edge-tests.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@neondatabase/serverless": "^0.10.1",
+    "ag-grid-community": "^36.3.0",
+    "ag-grid-react": "^36.3.0",
     "ai": "^3.4.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.460.0",

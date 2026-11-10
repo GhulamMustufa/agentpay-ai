@@ -7,7 +7,10 @@ describe("Database Client Unit Tests", () => {
     const client = getDbClient();
     expect(client).toBeNull();
 
-    const queryResult = await runQuery("SELECT * FROM users");
+    const queryResult = (await runQuery("SELECT * FROM users")) as {
+      simulated: boolean;
+      rows: unknown[];
+    };
     expect(queryResult.simulated).toBe(true);
     expect(queryResult.rows).toEqual([]);
   });

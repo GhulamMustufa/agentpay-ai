@@ -185,11 +185,37 @@ export async function handleMCPRequest(request: {
             }
           };
         }
+
+        const currencyCode = (args.currency || "USD").toUpperCase();
+        const schemaCheck = APIMatic.validatePayPalOrderPayload({
+          intent: args.intent || "CAPTURE",
+          purchase_units: [
+            {
+              amount: {
+                currency_code: currencyCode,
+                value: Number(args.amount || 0).toFixed(2),
+              },
+              description: `MCP Agent Autonomous Purchase: ${args.productId}`.slice(0, 127),
+            },
+          ],
+        });
+
+        if (!schemaCheck.valid) {
+          return {
+            jsonrpc: "2.0",
+            id,
+            error: {
+              code: -32602,
+              message: `APIMatic Schema Error: ${schemaCheck.errors.join("; ")}`,
+            },
+          };
+        }
+
         const gateway = getPaymentGateway();
         const orderResult = await gateway.createOrder({
           amount: args.amount,
-          currency: args.currency || "USD",
-          description: `MCP Agent Autonomous Purchase: ${args.productId}`,
+          currency: currencyCode,
+          description: `MCP Agent Autonomous Purchase: ${args.productId}`.slice(0, 127),
         });
         return {
           jsonrpc: "2.0",
@@ -202,6 +228,7 @@ export async function handleMCPRequest(request: {
                   orderId: orderResult.id,
                   status: orderResult.status,
                   schemaContext: APIMatic.getPayPalContext().schemaValidation,
+                  schemaValid: schemaCheck.valid,
                   approvalRequired: true,
                 }),
               },

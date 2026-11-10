@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const gateway = new PayPalPaymentGateway({
       clientId: clientId || process.env.PAYPAL_CLIENT_ID,
       clientSecret: clientSecret || process.env.PAYPAL_CLIENT_SECRET,
-      environment: environment || (process.env.PAYPAL_ENVIRONMENT as any) || "sandbox",
+      environment: environment || (process.env.PAYPAL_ENVIRONMENT as any) || (process.env.PAYPAL_MODE as any) || "sandbox",
     });
 
     const isLive = gateway.isLiveConfigured();

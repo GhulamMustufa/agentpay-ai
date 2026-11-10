@@ -6,6 +6,14 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "AgentPay AI - Safe AI Shopping with PayPal",
   description: "Smart AI shopping assistant that searches stores, stops hidden fees, and requires your 1-click confirmation before paying safely with PayPal.",
+  icons: {
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo.png", sizes: "256x256", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

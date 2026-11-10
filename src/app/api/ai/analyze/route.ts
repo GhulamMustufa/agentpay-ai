@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { analyzeShoppingPrompt, ShoppingAnalysisResult } from "@/lib/ai/shopping-agent";
+import { Channel3, Elastic, APIMatic } from "@/lib/integrations/sponsors";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,15 +14,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Query Channel3 Product Catalog & rank via Elastic hybrid relevance
+    const catalogProducts = await Channel3.searchProducts(prompt, budgetCap);
+    const rankedCatalog = await Elastic.semanticRank(prompt, catalogProducts);
+    const apimaticContract = APIMatic.getPayPalContextPrompt();
+
     const apiKey = geminiApiKey || process.env.GEMINI_API_KEY;
 
     // If an API key is available, call Google Gemini 3.5 Flash REST API
     if (apiKey && apiKey !== "your_gemini_api_key_here") {
       try {
+        const catalogSnippet = rankedCatalog
+          .slice(0, 3)
+          .map((p) => `- ${p.name} by ${p.merchant} ($${p.price.toFixed(2)}, specs: ${Object.values(p.specs).join(", ")})`)
+          .join("\n");
+
         const promptTemplate = `
 You are the AI procurement engine for AgentPay.
 The user wants to buy: "${prompt}".
 The user's maximum budget cap is $${budgetCap}.
+
+Channel3 + Elastic Catalog Candidates:
+${catalogSnippet || "No pre-indexed candidates; infer accurate current market products."}
+
+${apimaticContract}
 
 Evaluate the request:
 1. Is this a shopping or purchasing request? (e.g. buying a laptop, chair, headphones, coffee machine, etc.)
@@ -114,6 +129,11 @@ Return STRICT JSON matching this exact structure:
           isLiveLLM: true,
           model: "gemini-3.5-flash",
           provider: "Google Gemini AI (Live)",
+          integrations: {
+            channel3Candidates: catalogProducts.length,
+            elasticTopMatch: rankedCatalog[0]?.name || null,
+            apimaticSchema: APIMatic.getPayPalContext().schemaValidation,
+          },
           analysis: parsed,
         });
       } catch (llmErr: any) {
@@ -124,6 +144,11 @@ Return STRICT JSON matching this exact structure:
           isLiveLLM: false,
           fallbackReason: llmErr.message,
           provider: "AgentPay Smart Engine (Local Fallback)",
+          integrations: {
+            channel3Candidates: catalogProducts.length,
+            elasticTopMatch: rankedCatalog[0]?.name || null,
+            apimaticSchema: APIMatic.getPayPalContext().schemaValidation,
+          },
           analysis: fallback,
         });
       }
@@ -135,6 +160,11 @@ Return STRICT JSON matching this exact structure:
       success: true,
       isLiveLLM: false,
       provider: "AgentPay Dynamic Engine (Zero-Config)",
+      integrations: {
+        channel3Candidates: catalogProducts.length,
+        elasticTopMatch: rankedCatalog[0]?.name || null,
+        apimaticSchema: APIMatic.getPayPalContext().schemaValidation,
+      },
       analysis,
     });
   } catch (err: any) {

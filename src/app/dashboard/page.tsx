@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
@@ -25,6 +26,8 @@ import {
 import { sourcingAgent } from "@/lib/agents/sourcing-agent";
 import { policyAuditorAgent } from "@/lib/agents/auditor-agent";
 import { settlementAgent } from "@/lib/agents/settlement-agent";
+import { StoreComparisonGrid } from "@/components/grids/StoreComparisonGrid";
+import { LedgerHistoryGrid } from "@/components/grids/LedgerHistoryGrid";
 import {
   ArrowLeft,
   Play,
@@ -37,7 +40,6 @@ import {
   AlertTriangle,
   Lock,
   Send,
-  XCircle,
   Code2,
   Wallet,
   PiggyBank,
@@ -46,10 +48,10 @@ import {
   Sliders,
   History,
   FileCheck2,
-  ExternalLink,
   RefreshCw,
   Search,
   Layers,
+  Zap,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -70,10 +72,12 @@ export default function DashboardPage() {
   const [geminiKeyInput, setGeminiKeyInput] = useState("");
   const [paypalClientIdInput, setPaypalClientIdInput] = useState("");
   const [paypalClientSecretInput, setPaypalClientSecretInput] = useState("");
+  const [zapierWebhookInput, setZapierWebhookInput] = useState("");
 
   const [activeGeminiKey, setActiveGeminiKey] = useState("");
   const [activePaypalClientId, setActivePaypalClientId] = useState("");
   const [activePaypalClientSecret, setActivePaypalClientSecret] = useState("");
+  const [activeZapierWebhook, setActiveZapierWebhook] = useState("");
 
   // Search & Procurement State
   const [userPrompt, setUserPrompt] = useState("Find me a high-performance developer laptop under $900 with 16GB RAM");
@@ -183,6 +187,7 @@ export default function DashboardPage() {
       const gKey = sessionStorage.getItem("agentpay_gemini_key") || localStorage.getItem("agentpay_gemini_key") || "";
       const pId = sessionStorage.getItem("agentpay_paypal_client_id") || localStorage.getItem("agentpay_paypal_client_id") || "";
       const pSecret = sessionStorage.getItem("agentpay_paypal_client_secret") || localStorage.getItem("agentpay_paypal_client_secret") || "";
+      const zHook = sessionStorage.getItem("agentpay_zapier_webhook") || localStorage.getItem("agentpay_zapier_webhook") || "";
       if (gKey) {
         setGeminiKeyInput(gKey);
         setActiveGeminiKey(gKey);
@@ -194,6 +199,10 @@ export default function DashboardPage() {
       if (pSecret) {
         setPaypalClientSecretInput(pSecret);
         setActivePaypalClientSecret(pSecret);
+      }
+      if (zHook) {
+        setZapierWebhookInput(zHook);
+        setActiveZapierWebhook(zHook);
       }
     } catch {
       // Storage unavailable in private browsing mode
@@ -216,17 +225,20 @@ export default function DashboardPage() {
       sessionStorage.setItem("agentpay_gemini_key", geminiKeyInput.trim());
       sessionStorage.setItem("agentpay_paypal_client_id", paypalClientIdInput.trim());
       sessionStorage.setItem("agentpay_paypal_client_secret", paypalClientSecretInput.trim());
+      sessionStorage.setItem("agentpay_zapier_webhook", zapierWebhookInput.trim());
       localStorage.setItem("agentpay_gemini_key", geminiKeyInput.trim());
       localStorage.setItem("agentpay_paypal_client_id", paypalClientIdInput.trim());
       localStorage.setItem("agentpay_paypal_client_secret", paypalClientSecretInput.trim());
+      localStorage.setItem("agentpay_zapier_webhook", zapierWebhookInput.trim());
 
       setActiveGeminiKey(geminiKeyInput.trim());
       setActivePaypalClientId(paypalClientIdInput.trim());
       setActivePaypalClientSecret(paypalClientSecretInput.trim());
+      setActiveZapierWebhook(zapierWebhookInput.trim());
       setIsSettingsOpen(false);
       toast({
         title: "Keys Saved",
-        description: "Your keys are now active for live AI searches and PayPal Sandbox payments.",
+        description: "Your API keys and Zapier webhook are active for live searches, alerts, and PayPal Sandbox payments.",
         type: "success",
       });
     } catch {
@@ -243,15 +255,19 @@ export default function DashboardPage() {
       sessionStorage.removeItem("agentpay_gemini_key");
       sessionStorage.removeItem("agentpay_paypal_client_id");
       sessionStorage.removeItem("agentpay_paypal_client_secret");
+      sessionStorage.removeItem("agentpay_zapier_webhook");
       localStorage.removeItem("agentpay_gemini_key");
       localStorage.removeItem("agentpay_paypal_client_id");
       localStorage.removeItem("agentpay_paypal_client_secret");
+      localStorage.removeItem("agentpay_zapier_webhook");
       setGeminiKeyInput("");
       setPaypalClientIdInput("");
       setPaypalClientSecretInput("");
+      setZapierWebhookInput("");
       setActiveGeminiKey("");
       setActivePaypalClientId("");
       setActivePaypalClientSecret("");
+      setActiveZapierWebhook("");
       toast({
         title: "Keys Cleared",
         description: "Switched back to safe zero-setup test mode.",
@@ -264,6 +280,32 @@ export default function DashboardPage() {
 
   const hasLiveGemini = Boolean(activeGeminiKey);
   const hasLivePayPal = Boolean(activePaypalClientId && activePaypalClientSecret);
+  const hasLiveZapier = Boolean(activeZapierWebhook);
+
+  const emitZapierAlert = async (
+    event: "POLICY_OVERCHARGE_BLOCKED" | "PAYPAL_ORDER_CAPTURED",
+    payload: Record<string, any>
+  ) => {
+    try {
+      const res = await fetch("/api/zapier/webhook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event,
+          webhookUrl: activeZapierWebhook || undefined,
+          payload,
+        }),
+      });
+      const data = await res.json();
+      if (data.dispatched) {
+        setLogs((prev) => [...prev, `⚡ Zapier Webhook Delivered: ${event} (HTTP ${data.statusCode})`]);
+      } else if (data.simulated) {
+        setLogs((prev) => [...prev, `⚡ Zapier Event Ready (${event}): add webhook URL in API Keys to fire live Zaps.`]);
+      }
+    } catch {
+      // Non-blocking telemetry
+    }
+  };
 
   // Quick Preset Selection Helper
   const applyPreset = (promptText: string, budget: number, category: string) => {
@@ -352,6 +394,12 @@ export default function DashboardPage() {
       setLogs((prev) => [
         ...prev,
         `✓ Found ${sourcingResult.quotes.length} store quotes in ${sourcingResult.latencyMs}ms.`,
+        sourcingResult.integrations?.channel3Candidates
+          ? `📦 Channel3 & Elastic: Ranked ${sourcingResult.integrations.channel3Candidates} catalog matches (Top: ${sourcingResult.integrations.elasticTopMatch || "Verified"})`
+          : "",
+        sourcingResult.integrations?.apimaticSchema
+          ? `📄 APIMatic: ${sourcingResult.integrations.apimaticSchema}`
+          : "",
         sourcingResult.isMultiItem ? `📦 Multi-item package split into component items to fit your budget.` : "",
         `🛡️ 2. Fee Inspector: Checking every quote line-by-line for hidden markups...`,
       ].filter(Boolean));
@@ -382,6 +430,13 @@ export default function DashboardPage() {
             markup: `$${auditResult.violatingQuote.markup.toFixed(2)}`,
             reason: viols.length > 0 ? viols.join(" • ") : "Unapproved fee",
             violations: viols,
+          });
+          void emitZapierAlert("POLICY_OVERCHARGE_BLOCKED", {
+            vendor: auditResult.violatingQuote.vendor,
+            quotedAmount: auditResult.violatingQuote.price,
+            budgetCap,
+            blockedMarkup: auditResult.violatingQuote.markup,
+            reason: viols.join(" • ") || "Unapproved fee",
           });
         }
 
@@ -479,6 +534,15 @@ export default function DashboardPage() {
         `✨ Payment Confirmed in ${settlement.latencyMs}ms! PayPal Order #${settlement.orderId} captured safely.`,
         `Saved to history: prevented $${moneySaved.toFixed(2)} in hidden charges.`,
       ]);
+
+      void emitZapierAlert("PAYPAL_ORDER_CAPTURED", {
+        orderId: settlement.orderId,
+        item: itemName,
+        merchant: merchantName,
+        paidAmount: priceAmount,
+        moneySaved,
+        latencyMs: settlement.latencyMs,
+      });
 
       setIsRunning(false);
       setStatus("success");
@@ -580,6 +644,14 @@ export default function DashboardPage() {
               <ArrowLeft className="w-4 h-4 mr-1" /> Home
             </Button>
           </Link>
+          <Image
+            src="/logo.png"
+            alt="AgentPay AI logo"
+            width={28}
+            height={28}
+            priority
+            className="w-7 h-7 rounded-md shadow-sm shrink-0"
+          />
           <span className="font-semibold text-sm sm:text-base tracking-tight truncate text-foreground">
             AgentPay AI Shopping
           </span>
@@ -894,56 +966,16 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* CARD 2: STORE PRICE COMPARISON TABLE */}
+        {/* CARD 2: STORE PRICE COMPARISON TABLE (AG Grid) */}
         <Card className="glass">
           <CardHeader className="p-4 pb-2">
             <CardTitle className="text-sm font-semibold flex items-center justify-between">
               <span>Store Price Comparison</span>
-              <span className="text-xs text-muted-foreground font-normal">Prices checked across verified stores</span>
+              <span className="text-xs text-muted-foreground font-normal">Interactive AG Grid across verified stores</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-1">
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead className="border-b border-border text-muted-foreground font-medium">
-                  <tr>
-                    <th className="py-2 px-3">Seller / Store</th>
-                    <th className="py-2 px-3">Item</th>
-                    <th className="py-2 px-3">Price</th>
-                    <th className="py-2 px-3">Fee &amp; Rule Check</th>
-                    <th className="py-2 px-3">Decision</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {quotes.map((q, idx) => (
-                    <tr key={idx} className={!q.isCompliant ? "" : "bg-emerald-500/5"}>
-                      <td className="py-2.5 px-3 flex items-center gap-1.5 text-foreground font-medium">
-                        {!q.isCompliant ? (
-                          <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                        ) : (
-                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        )}
-                        {q.vendor}
-                      </td>
-                      <td className="py-2.5 px-3 text-muted-foreground">{q.item}</td>
-                      <td className={`py-2.5 px-3 font-semibold ${!q.isCompliant ? "text-rose-400" : "text-emerald-400"}`}>
-                        ${q.price.toFixed(2)}
-                      </td>
-                      <td className={`py-2.5 px-3 ${!q.isCompliant ? "text-rose-300" : "text-emerald-400"}`}>
-                        {!q.isCompliant ? `Over budget (+$${q.markup.toFixed(2)} extra fee)` : `Fair price (${q.warranty})`}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        {!q.isCompliant ? (
-                          <Badge variant="destructive" className="text-[10px]">Blocked</Badge>
-                        ) : (
-                          <Badge variant="success" className="text-[10px]">Approved</Badge>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <StoreComparisonGrid quotes={quotes} />
           </CardContent>
         </Card>
 
@@ -998,47 +1030,23 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* TAB 2: AUDIT LEDGER */}
+            {/* TAB 2: AUDIT LEDGER (AG Grid) */}
             {activeConsoleTab === "ledger" && (
               <div className="space-y-2 text-xs font-sans animate-in fade-in">
                 <div className="flex items-center justify-between text-xs text-muted-foreground pb-1">
                   <span>Saved history of past purchases and extra fees prevented:</span>
-                  <button onClick={clearLedger} className="text-[10px] text-muted-foreground hover:text-foreground underline">
+                  <button
+                    onClick={() => {
+                      clearLedger();
+                      setLedger(getLedgerRecords());
+                      setSavingsSummary(getSavingsSummary());
+                    }}
+                    className="text-[10px] text-muted-foreground hover:text-foreground underline"
+                  >
                     Clear History
                   </button>
                 </div>
-                <div className="overflow-x-auto max-h-[220px]">
-                  <table className="w-full text-left text-[11px]">
-                    <thead className="border-b border-border text-muted-foreground font-medium">
-                      <tr>
-                        <th className="py-1.5 px-2">Date</th>
-                        <th className="py-1.5 px-2">Product &amp; Store</th>
-                        <th className="py-1.5 px-2">Price Paid</th>
-                        <th className="py-1.5 px-2">Money Saved</th>
-                        <th className="py-1.5 px-2">PayPal Order ID</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/60">
-                      {ledger.map((r) => (
-                        <tr key={r.id} className="hover:bg-muted/30">
-                          <td className="py-1.5 px-2 text-muted-foreground font-mono">{new Date(r.timestamp).toLocaleDateString()}</td>
-                          <td className="py-1.5 px-2 text-foreground font-medium">{r.item} <span className="text-muted-foreground font-normal">({r.merchant})</span></td>
-                          <td className="py-1.5 px-2 text-emerald-400 font-semibold">${r.paidAmount.toFixed(2)}</td>
-                          <td className="py-1.5 px-2 text-purple-400 font-semibold">+${r.moneySaved.toFixed(2)}</td>
-                          <td className="py-1.5 px-2 font-mono text-[10px] text-primary">
-                            {r.receiptUrl ? (
-                              <a href={r.receiptUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:underline">
-                                #{r.paypalOrderId} <ExternalLink className="w-2.5 h-2.5" />
-                              </a>
-                            ) : (
-                              `#${r.paypalOrderId}`
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <LedgerHistoryGrid records={ledger} />
               </div>
             )}
 
@@ -1248,6 +1256,12 @@ export default function DashboardPage() {
                   {hasLivePayPal ? "🟢 Live Sandbox Connected" : "⚪ Ready in Test Mode"}
                 </span>
               </div>
+              <div className="flex items-center justify-between">
+                <span>Zapier Webhooks:</span>
+                <span className={hasLiveZapier ? "text-emerald-400 font-semibold" : "text-muted-foreground font-medium"}>
+                  {hasLiveZapier ? "🟢 Live Webhook Active" : "⚪ Ready in Test Mode"}
+                </span>
+              </div>
             </div>
             <p className="text-[11px] text-muted-foreground pt-1 border-t border-border/50">
               Judges can test every feature immediately without creating any accounts.
@@ -1310,6 +1324,23 @@ export default function DashboardPage() {
             />
           </div>
 
+          {/* Zapier Webhook Input */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-medium text-foreground flex items-center gap-1">
+                <Zap className="w-3 h-3 text-amber-400" /> Zapier Catch Hook URL (Optional)
+              </label>
+              <span className="text-[10px] text-muted-foreground">Alerts Slack / Sheets on blocks &amp; captures</span>
+            </div>
+            <input
+              type="url"
+              value={zapierWebhookInput}
+              onChange={(e) => setZapierWebhookInput(e.target.value)}
+              placeholder="https://hooks.zapier.com/hooks/catch/..."
+              className="w-full text-xs px-3 py-2 rounded-md bg-muted/50 border border-border text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+
           {/* Easy-Word Explanatory Note */}
           <div className="p-3 rounded-lg border border-border bg-blue-500/5 space-y-1.5 text-[11px] leading-relaxed text-muted-foreground">
             <span className="font-semibold text-foreground text-xs block">💡 Quick Note in Simple Words:</span>
@@ -1361,32 +1392,44 @@ export default function DashboardPage() {
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground max-h-[60vh] overflow-y-auto pr-1">
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">💳 PayPal Developer Platform</h4>
-            <p>Creates checkout orders and confirms payments safely using the PayPal Orders API.</p>
-            <code className="text-[10px] font-mono text-primary block mt-1">src/lib/payments/paypal.ts:13-92</code>
-          </div>
-
-          <div className="p-3 rounded-lg border border-border bg-card">
-            <h4 className="font-semibold text-foreground mb-0.5">🔍 Elastic Search</h4>
-            <p>Matches what you ask for against store inventory to find the best products.</p>
-            <code className="text-[10px] font-mono text-emerald-400 block mt-1">src/lib/integrations/sponsors.ts:70-76</code>
+            <p>Creates checkout orders and captures payments safely using the PayPal Orders v2 API &amp; OAuth2.</p>
+            <code className="text-[10px] font-mono text-primary block mt-1">src/lib/payments/paypal.ts:3-121</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">📦 Channel3 Product Catalog</h4>
-            <p>Supplies live store prices and product availability information.</p>
-            <code className="text-[10px] font-mono text-purple-400 block mt-1">src/lib/integrations/sponsors.ts:25-67</code>
+            <p>Queries real-time product inventory and pricing via Channel3 API with curated catalog fallback.</p>
+            <code className="text-[10px] font-mono text-purple-400 block mt-1">src/lib/integrations/sponsors.ts:40-171</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
-            <h4 className="font-semibold text-foreground mb-0.5">📄 APIMatic Schema Context</h4>
-            <p>Validates data formats so the AI never sends malformed parameters to PayPal.</p>
-            <code className="text-[10px] font-mono text-blue-400 block mt-1">src/lib/integrations/sponsors.ts:79-90</code>
+            <h4 className="font-semibold text-foreground mb-0.5">📊 AG Grid Enterprise Data Grids</h4>
+            <p>Powers interactive store comparison, sorting, quick filtering, and CSV export across quotes and ledger history.</p>
+            <code className="text-[10px] font-mono text-cyan-400 block mt-1">src/components/grids/StoreComparisonGrid.tsx:1-204</code>
           </div>
 
           <div className="p-3 rounded-lg border border-border bg-card">
-            <h4 className="font-semibold text-foreground mb-0.5">📮 Postman Test Suite</h4>
-            <p>Ready-to-run Postman test collection verifying live PayPal endpoints.</p>
-            <code className="text-[10px] font-mono text-amber-400 block mt-1">postman/paypal-ai-collection.json</code>
+            <h4 className="font-semibold text-foreground mb-0.5">📄 APIMatic OpenAPI Schema Context</h4>
+            <p>Injects PayPal Orders v2 OpenAPI contracts into prompts and validates every order payload before dispatch.</p>
+            <code className="text-[10px] font-mono text-blue-400 block mt-1">src/lib/integrations/sponsors.ts:248-326</code>
+          </div>
+
+          <div className="p-3 rounded-lg border border-border bg-card">
+            <h4 className="font-semibold text-foreground mb-0.5">🔍 Elastic Hybrid Search</h4>
+            <p>Ranks product matches via Elasticsearch cluster queries or hybrid BM25 token + spec scoring.</p>
+            <code className="text-[10px] font-mono text-emerald-400 block mt-1">src/lib/integrations/sponsors.ts:173-246</code>
+          </div>
+
+          <div className="p-3 rounded-lg border border-border bg-card">
+            <h4 className="font-semibold text-foreground mb-0.5">⚡ Zapier Webhook Automation</h4>
+            <p>Dispatches real-time webhook alerts on blocked hidden fees and captured PayPal orders.</p>
+            <code className="text-[10px] font-mono text-amber-400 block mt-1">src/lib/integrations/sponsors.ts:328-380 • src/app/api/zapier/webhook/route.ts</code>
+          </div>
+
+          <div className="p-3 rounded-lg border border-border bg-card">
+            <h4 className="font-semibold text-foreground mb-0.5">📮 Postman &amp; ☁️ Render Blueprint</h4>
+            <p>Ready-to-run Postman test suite and 1-click Render production deployment configuration.</p>
+            <code className="text-[10px] font-mono text-muted-foreground block mt-1">postman/paypal-ai-collection.json • render.yaml</code>
           </div>
 
           <div className="pt-2 flex justify-end">

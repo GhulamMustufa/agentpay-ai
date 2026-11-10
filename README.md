@@ -4,7 +4,7 @@
 
 [![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-blue)](http://localhost:3000)
 [![PayPal Integration](https://img.shields.io/badge/PayPal-Orders%20v2-emerald)](./SPONSORS.md)
-[![Tests](https://img.shields.io/badge/Tests-21%20Passing-purple)](./src/lib/__tests__)
+[![Tests](https://img.shields.io/badge/Tests-26%20Passing-purple)](./src/lib/__tests__)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ---
@@ -56,7 +56,7 @@ npm run dev
 ## 🧪 Automated Tests
 
 ```bash
-# Run unit tests (All 21 tests pass in < 700ms)
+# Run unit tests (All 26 tests pass in < 800ms)
 npm test
 
 # Run live edge-case suite (Real PayPal Sandbox & Gemini tests)

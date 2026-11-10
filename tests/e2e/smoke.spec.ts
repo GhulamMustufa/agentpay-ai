@@ -10,7 +10,7 @@ test.describe("AgentPay AI E2E Smoke Tests", () => {
   test("2. Theme toggle switches between dark and light modes cleanly", async ({ page }) => {
     await page.goto("/");
     const html = page.locator("html");
-    
+
     // Check initial dark mode
     await expect(html).toHaveClass(/dark/);
 
@@ -32,25 +32,24 @@ test.describe("AgentPay AI E2E Smoke Tests", () => {
     await demoButton.click();
 
     await expect(page).toHaveURL(/.*dashboard/);
-    await expect(page.getByText("Shopping Demo & Dashboard")).toBeVisible();
-    await expect(page.getByText("Your Spending Limit")).toBeVisible();
+    await expect(page.getByText("AgentPay AI Shopping")).toBeVisible();
+    await expect(page.getByText("Spending Limit")).toBeVisible();
+    await expect(page.getByText("Powered by AG Grid")).toBeVisible();
   });
 
-  test("4. Magic Moment execution triggers shopping search and catch", async ({ page }) => {
+  test("4. Magic Moment execution triggers shopping search, catches hidden fee, and enables 1-click PayPal approval", async ({ page }) => {
     await page.goto("/dashboard");
-    const executeButton = page.getByRole("button", { name: /start shopping search/i });
+    const executeButton = page.getByRole("button", { name: /find best deals safely/i });
     await executeButton.click();
 
-    // Verify searching state
-    await expect(page.getByText(/searching stores/i)).toBeVisible();
-
-    // Await fee caught or approval state
-    await expect(page.getByText(/sneaky fee caught|your approval needed/i)).toBeVisible({ timeout: 5000 });
+    // Await fee blocked alert and 1-click approval button
+    await expect(page.getByText(/overpriced store blocked/i)).toBeVisible({ timeout: 8000 });
+    await expect(page.getByRole("button", { name: /1-click approve via paypal/i })).toBeVisible({ timeout: 8000 });
   });
 
   test("5. Interactive Documentation (/docs) loads with quickstart and copy button", async ({ page }) => {
     await page.goto("/docs");
-    await expect(page.getByText("Interactive Documentation")).toBeVisible();
-    await expect(page.getByText("Quickstart Guide")).toBeVisible();
+    await expect(page.getByText("Quickstart: Run AgentPay in 2 Minutes")).toBeVisible();
+    await expect(page.getByText("Sponsor Developer Tools")).toBeVisible();
   });
 });
