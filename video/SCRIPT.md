@@ -1,66 +1,59 @@
-# 🎬 150-Second Video Script: AgentPay AI
+# 🎬 2-Minute Video Script & Smart Recording Guide: AgentPay AI
 
-Follow this timestamped guide while recording your screen. Keep your voice conversational, confident, and natural. Total time: **2 minutes 30 seconds** (well under Devpost's 3-minute limit).
-
----
-
-### [ 0:00 - 0:25 ] The Hook: The Real Problem
-> **What you say**:  
-> *"Would you give an AI assistant your credit card? Probably not. People want to use AI to find products and deals, but nobody trusts an AI with their bank account. What if it gets tricked by a hidden fee or overspends your budget? That is why we built **AgentPay AI**: the financial firewall for AI shopping powered by PayPal. It searches catalogs via Channel3 and Elastic, catches hidden fees in real time, and requires your 1-click approval before paying."*
->  
-> **What you show**:  
-> Start on the homepage (`/`): headline reading *"Shop with AI. Never get overcharged."* Show the clean design and click the theme toggle once to demonstrate dark and light themes.
+Follow this timestamped guide while recording your screen. Total target time: **~2 minutes** (comfortably under Devpost's 3-minute maximum).
 
 ---
 
-### [ 0:25 - 0:55 ] The Magic Moment: Catching the Sneaky Fee Live
-> **What you say**:  
-> *"Let's see it in action. Judges can test this immediately with zero sign-up. I click 'Try the Live Demo', which opens our dashboard with a $900 spending limit. When I click 'Find Best Deals Safely', our 3-agent pipeline searches verified stores via Channel3 and ranks specs with Elastic. Store A, CloudTech Supply, quotes $949.00 with a hidden $100 rush fee. Instantly, our Fee Inspector **stops the purchase**, logs a Zapier alert, and switches to Official Dell Direct at $849.00."*
->  
-> **What you show**:  
-> 1. Click **"Try the Live Demo (No Sign-Up Needed)"** $\to$ lands on `/dashboard`.  
-> 2. Click **"Find Best Deals Safely"**.  
-> 3. Point cursor to the **red alert banner**:  
->    `Overpriced Store Blocked: CloudTech Supply $949.00 ($49 over your budget • $100 hidden fee)`  
-> 4. Point to the emerald **Best Fair Price Found** card for **Official Dell Direct ($849.00)**.
+## 🛠️ Smart Recording Prep (Mac Checklist)
+
+1. **Use a clean Chrome window:** Open **`https://agentpay-ai.onrender.com`** by itself (close unrelated tabs so personal emails/messages don't appear).
+2. **Hide bookmarks bar:** Press **`Cmd + Shift + B`** on Mac.
+3. **Zoom for readability:** Press **`Cmd + +`** once (`110%` zoom) so text, prices, and alerts look sharp on YouTube.
+4. **Warm up once first:** Click **`Try the Live Demo`**, run **`Find Best Deals Safely`** once so Render, Gemini, Channel3, Elastic, and Neon DB are warm, then click **`Home`** before pressing Record.
+5. **Record cleanly:** Press **`Cmd + Shift + 5`** → **Record Selected Window** (Chrome) → select your headset/mic under **Options**. Pause 1–2 seconds between scenes so you can trim any loading wait in QuickTime (`Cmd + T`), iMovie, or CapCut.
+6. **YouTube settings:** Upload as **Unlisted** or **Public** (never *Private*).
 
 ---
 
-### [ 0:55 - 1:20 ] Your 1-Click Approval & APIMatic + PayPal Settlement
-> **What you say**:  
-> *"Notice that the AI can never spend money on its own. Before creating an order, APIMatic validates the PayPal Orders v2 schema so the AI never hallucinates invalid fields. When I click '1-Click Approve via PayPal', the order is created and captured via PayPal Sandbox in milliseconds, updating our savings ledger and firing a Zapier webhook."*
->  
-> **What you show**:  
-> 1. Click **"1-Click Approve via PayPal"** on the approval card.  
-> 2. Show the green success toast: *"Payment Successful! Paid $849.00 via PayPal..."*  
-> 3. Show **Total Saved** and the **Live Activity Log** updating with the PayPal Order ID and Zapier event.
+## 🎙️ Easy-Words Spoken Script (~2:05)
+
+### [ 0:00 – 0:20 ] The Problem (Start on `/`)
+* **Show:** Stay on `https://agentpay-ai.onrender.com/`, hover over *"Shop with AI. Never get overcharged."*
+* **Say:**
+  > *"Hi everyone! Today AI can search the web and shop for us—but honestly, would you give an AI your credit card? What if it falls for a hidden fee or spends over your budget? That's why we built **AgentPay AI**. It's a smart safety layer between AI shopping and your PayPal account."*
 
 ---
 
-### [ 1:20 - 1:50 ] AG Grid Comparison & Open MCP Server
-> **What you say**:  
-> *"Down below, our Store Price Comparison and Past Purchases ledger are powered by AG Grid—giving users sortable columns, live filtering, and 1-click CSV export. We also expose an open Model Context Protocol server at `/api/mcp`. Clicking 'PayPal AI Tools' and 'Test Hidden-Fee Detector' shows a live JSON-RPC safety check that external AI assistants like Claude or Cursor can call directly."*
->  
-> **What you show**:  
-> 1. Type in the **AG Grid** filter box (`Filter stores, specs, or fees...`) and show **Export CSV**.  
-> 2. In the bottom console, click **"PayPal AI Tools"** $\to$ click **"Test Hidden-Fee Detector"**.  
-> 3. Show the live green response: `✓ Response from PayPal Server (Status 200)` with `action: "HALT_PAYMENT"`.
+### [ 0:20 – 0:55 ] Catching a Sneaky Fee Live (`/dashboard`)
+* **Show:**
+  1. Click **`Try the Live Demo (No Sign-Up Needed)`** → lands on `/dashboard` with the laptop prompt and `$900` limit pre-filled.
+  2. Click **`Find Best Deals Safely`**.
+  3. Point your cursor at the **red blocked store card** (`$949.00` with `$100` hidden fee), then at the **green recommended card** (**Official Dell Direct — `$849.00`**).
+* **Say:**
+  > *"Judges can try this in one click with zero sign-up. Here I ask for a developer laptop with a strict $900 budget limit. When I click Find Best Deals, our AI searches real product catalogs with Channel3 and Elastic, and checks every store quote line by line. Look—Store A quoted $949 with a sneaky $100 rush fee. AgentPay immediately blocks it in red, saves me $100, and picks Official Dell Direct at $849."*
 
 ---
 
-### [ 1:50 - 2:15 ] Developer Tools & Architecture
-> **What you say**:  
-> *"Technical judges can click 'Developer Tools' in the header to verify exact file references for PayPal Orders v2, Channel3, AG Grid, APIMatic, Elastic, Zapier, our Postman collection, and our Render cloud blueprint."*
->  
-> **What you show**:  
-> 1. Click **"Developer Tools"** in the top navbar to display the sponsor integration cards.  
-> 2. Click **"API Keys"** briefly to show optional live Gemini, PayPal Sandbox, and Zapier Catch Hook inputs.
+### [ 0:55 – 1:25 ] Your 1-Click Approval & Live PayPal Settlement
+* **Show:**
+  1. Click **`1-Click Approve via PayPal`**.
+  2. Wait 1–2 seconds for the green success toast, then point to **`Total Saved`** updating.
+  3. Click **`Past Purchases & Savings`** tab at the bottom to show the receipt saved in **Neon Postgres**.
+* **Say:**
+  > *"Notice the AI can never pay by itself—it always waits for my confirmation. Before creating any order, APIMatic checks the PayPal payment schema so nothing breaks. Now I click 1-Click Approve, PayPal Sandbox completes the payment right away, and the receipt is saved to our Neon Postgres database and local backup."*
 
 ---
 
-### [ 2:15 - 2:30 ] Wrap-Up & Closing
-> **What you say**:  
-> *"AgentPay AI makes autonomous commerce safe, transparent, and trustworthy—backed by 43 automated unit tests, 7 live sponsor checks, 6 Playwright E2E scenarios, and zero-setup sandbox access. Try the live demo on Devpost today. Thank you!"*
->  
-> **What you show**:  
-> Return to the homepage showing the live demo link and GitHub repository.
+### [ 1:25 – 1:50 ] Interactive AG Grid & Open AI Safety Tools (MCP)
+* **Show:**
+  1. Scroll to **`Store Price Comparison`** → type `"Dell"` in the filter box (or open a column filter / click **`Export CSV`**).
+  2. Click **`PayPal AI Tools`** tab at the bottom → click **`Test Hidden-Fee Detector`** → show `Status 200` with `action: "HALT_PAYMENT"`.
+* **Say:**
+  > *"All store quotes and receipts run in interactive AG Grid tables so users can filter, sort, or export CSV in one click. We also built an open MCP server so external AI assistants like Claude or Cursor can use these same PayPal safety rules—and if an AI tries to overspend, our server blocks it automatically."*
+
+---
+
+### [ 1:50 – 2:05 ] Developer Tools & Closing
+* **Show:** Briefly click **`Developer Tools`** in the top navbar for 3 seconds to show all sponsor integrations (PayPal, Channel3, Elastic, APIMatic, AG Grid, Zapier, Neon, Render, Postman), then return cleanly to `/`.
+* **Say:**
+  > *"We deployed live on Render with 43 unit tests, 6 browser E2E tests, a Postman suite, and full Zapier alerts. You can test the live demo right from our Devpost link—thanks for watching!"*

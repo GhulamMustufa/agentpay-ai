@@ -1264,7 +1264,7 @@ export default function DashboardPage() {
             </label>
           </div>
 
-          <div className="pt-2 flex items-center justify-between border-t border-border/60">
+          <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-border/60">
             <Button
               type="button"
               variant="outline"
@@ -1420,7 +1420,7 @@ export default function DashboardPage() {
           </p>
 
           {/* Action Buttons */}
-          <div className="pt-2 flex items-center justify-between">
+          <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-border/60">
             <Button
               type="button"
               variant="outline"
@@ -1449,7 +1449,7 @@ export default function DashboardPage() {
         title="Developer Tools Used"
         description="A quick reference showing where each developer tool is used in our code."
       >
-        <div className="space-y-3 text-xs leading-relaxed text-muted-foreground max-h-[60vh] overflow-y-auto pr-1">
+        <div className="space-y-3 text-xs leading-relaxed text-muted-foreground">
           <div className="p-3 rounded-lg border border-border bg-card">
             <h4 className="font-semibold text-foreground mb-0.5">💳 PayPal Developer Platform</h4>
             <p>Creates checkout orders and captures payments safely using the PayPal Orders v2 API &amp; OAuth2.</p>

@@ -243,13 +243,40 @@ test.describe("AgentPay AI Principal QA End-to-End Suite", () => {
     await expect(page.getByText(/response from paypal server \(status 200\)/i)).toBeVisible({ timeout: 10000 });
     await expect(page.getByText(/HALT_PAYMENT/)).toBeVisible();
 
-    // Modals: My Rules & Developer Tools
+    // Modals: My Rules, API Keys (scrollable on short viewports), & Developer Tools
     await page.getByRole("button", { name: /my rules/i }).click();
     await expect(page.getByText("Your Shopping & Safety Rules")).toBeVisible();
     await Promise.all([
       page.waitForResponse((r) => r.url().includes("/api/policy") && r.request().method() === "PUT"),
       page.getByRole("button", { name: /save rules/i }).click(),
     ]);
+
+    // API Keys modal must stay within viewport and scroll smoothly down to Save Keys
+    await page.setViewportSize({ width: 1280, height: 700 });
+    await page.getByRole("button", { name: /api keys/i }).click();
+    const apiKeysDialog = page.getByRole("dialog");
+    await expect(apiKeysDialog).toBeVisible();
+    await expect(apiKeysDialog.getByText("Connect Your API Keys (Optional)")).toBeVisible();
+
+    const dialogBox = await apiKeysDialog.boundingBox();
+    expect(dialogBox?.y ?? -1).toBeGreaterThanOrEqual(0);
+    expect((dialogBox?.y ?? 0) + (dialogBox?.height ?? 9999)).toBeLessThanOrEqual(700);
+
+    const scrollMetrics = await apiKeysDialog.locator(".overflow-y-auto").evaluate((el) => {
+      const before = el.scrollTop;
+      el.scrollTop = el.scrollHeight;
+      return {
+        scrollHeight: el.scrollHeight,
+        clientHeight: el.clientHeight,
+        before,
+        after: el.scrollTop,
+      };
+    });
+    expect(scrollMetrics.scrollHeight).toBeGreaterThan(scrollMetrics.clientHeight);
+    expect(scrollMetrics.after).toBeGreaterThan(scrollMetrics.before);
+    await expect(apiKeysDialog.getByRole("button", { name: /close dialog/i })).toBeInViewport();
+    await expect(apiKeysDialog.getByRole("button", { name: /save keys/i })).toBeInViewport();
+    await apiKeysDialog.getByRole("button", { name: /^cancel$/i }).click();
 
     await page.getByRole("button", { name: /developer tools/i }).click();
     await expect(page.getByText("Developer Tools Used")).toBeVisible();
