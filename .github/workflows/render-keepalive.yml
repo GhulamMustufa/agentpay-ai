@@ -11,9 +11,9 @@ jobs:
     if: vars.RENDER_KEEPALIVE_ENABLED != 'false'
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Render /api/health endpoint
+      - name: Ping Render root URL without waking Neon DB
         env:
-          TARGET_URL: ${{ vars.RENDER_HEALTH_URL || 'https://agentpay-ai.onrender.com/api/health' }}
+          TARGET_URL: ${{ vars.RENDER_KEEPALIVE_URL || vars.RENDER_HEALTH_URL || 'https://agentpay-ai.onrender.com/' }}
         run: |
           echo "Probing $TARGET_URL ..."
           RESPONSE=$(curl -sS -m 60 -w "\nHTTP_STATUS:%{http_code}\nTIME_TOTAL:%{time_total}" "$TARGET_URL" || true)

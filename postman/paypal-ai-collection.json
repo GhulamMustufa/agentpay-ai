@@ -2,9 +2,16 @@
   "info": {
     "name": "AgentPay - PayPal AI API Test Suite",
     "_postman_id": "c71a39df-1558-45e0-9428-paypal-ai-2026",
-    "description": "Comprehensive Postman test collection for AgentPay's PayPal Orders v2 integration, token issuance, and agentic settlement workflows.",
+    "description": "Comprehensive Postman test collection for AgentPay's PayPal Orders v2 integration, token issuance, and agentic settlement workflows. Defaults {{base_url}} to live Render deployment (override to http://localhost:3000 for local testing).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://agentpay-ai.onrender.com",
+      "type": "string"
+    }
+  ],
   "item": [
     {
       "name": "1. PayPal OAuth2 Token",
@@ -65,7 +72,7 @@
       }
     },
     {
-      "name": "4. AgentPay Local AI Analyze (Gemini + Rules)",
+      "name": "4. AgentPay AI Analyze (Gemini + Channel3 + Elastic + Rules)",
       "request": {
         "method": "POST",
         "header": [
@@ -76,16 +83,14 @@
           "raw": "{\n  \"prompt\": \"Find me noise cancelling headphones under $250\",\n  \"budgetCap\": 250\n}"
         },
         "url": {
-          "raw": "http://localhost:3000/api/ai/analyze",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/ai/analyze",
+          "host": ["{{base_url}}"],
           "path": ["api", "ai", "analyze"]
         }
       }
     },
     {
-      "name": "5. AgentPay Local Create Order",
+      "name": "5. AgentPay Create Order",
       "request": {
         "method": "POST",
         "header": [
@@ -96,16 +101,14 @@
           "raw": "{\n  \"amount\": 849.00,\n  \"currency\": \"USD\",\n  \"description\": \"Dell XPS 13 Developer Edition\"\n}"
         },
         "url": {
-          "raw": "http://localhost:3000/api/paypal/create-order",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/paypal/create-order",
+          "host": ["{{base_url}}"],
           "path": ["api", "paypal", "create-order"]
         }
       }
     },
     {
-      "name": "6. AgentPay Local Capture Order",
+      "name": "6. AgentPay Capture Order",
       "request": {
         "method": "POST",
         "header": [
@@ -116,10 +119,8 @@
           "raw": "{\n  \"orderId\": \"ORDER-SAMPLE-ID\"\n}"
         },
         "url": {
-          "raw": "http://localhost:3000/api/paypal/capture-order",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/paypal/capture-order",
+          "host": ["{{base_url}}"],
           "path": ["api", "paypal", "capture-order"]
         }
       }
@@ -136,10 +137,8 @@
           "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"test_1\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"paypal_check_purchase_policy\",\n    \"arguments\": {\n      \"vendorName\": \"CloudTech Supply\",\n      \"quotedAmount\": 949.00,\n      \"budgetCap\": 900.00,\n      \"unapprovedMarkup\": 100.00\n    }\n  }\n}"
         },
         "url": {
-          "raw": "http://localhost:3000/api/mcp",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/mcp",
+          "host": ["{{base_url}}"],
           "path": ["api", "mcp"]
         }
       }
@@ -156,10 +155,8 @@
           "raw": "{\n  \"event\": \"POLICY_OVERCHARGE_BLOCKED\",\n  \"payload\": {\n    \"vendor\": \"CloudTech Supply\",\n    \"quotedAmount\": 949.00,\n    \"budgetCap\": 900.00,\n    \"blockedMarkup\": 100.00\n  }\n}"
         },
         "url": {
-          "raw": "http://localhost:3000/api/zapier/webhook",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/zapier/webhook",
+          "host": ["{{base_url}}"],
           "path": ["api", "zapier", "webhook"]
         }
       }
@@ -170,10 +167,8 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3000/api/health",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/health",
+          "host": ["{{base_url}}"],
           "path": ["api", "health"]
         }
       }
@@ -184,10 +179,8 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3000/api/ledger?workspaceId=default",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/ledger?workspaceId=default",
+          "host": ["{{base_url}}"],
           "path": ["api", "ledger"],
           "query": [{ "key": "workspaceId", "value": "default" }]
         }
@@ -199,10 +192,8 @@
         "method": "POST",
         "header": [],
         "url": {
-          "raw": "http://localhost:3000/api/edge-tests",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{base_url}}/api/edge-tests",
+          "host": ["{{base_url}}"],
           "path": ["api", "edge-tests"]
         }
       }

@@ -1,5 +1,10 @@
 # 🚀 Devpost Submission: AgentPay AI
 
+- **Live Demo (Render):** https://agentpay-ai.onrender.com
+- **API & Sponsor Health:** https://agentpay-ai.onrender.com/api/health
+- **Interactive Pitch Deck:** https://agentpay-ai.onrender.com/slides.html
+- **Live Docs:** https://agentpay-ai.onrender.com/docs
+
 ---
 
 ### Elevator Pitch (Under 120 Characters)

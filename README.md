@@ -2,7 +2,7 @@
 
 > **The smart AI shopping assistant that checks prices, catches hidden fees, and asks for your 1-click approval before paying with PayPal.**
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-blue)](http://localhost:3000)
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20on%20Render-blue)](https://agentpay-ai.onrender.com)
 [![PayPal Integration](https://img.shields.io/badge/PayPal-Orders%20v2-emerald)](./SPONSORS.md)
 [![Tests](https://img.shields.io/badge/Tests-43%20Unit%20%7C%206%20E2E-purple)](./src/lib/__tests__)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)

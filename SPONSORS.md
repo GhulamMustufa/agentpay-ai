@@ -44,4 +44,4 @@ This project implements verified, testable integrations with official hackathon 
 
 ## 7. Postman & Render
 - **Postman**: Ready-to-import test suite in [`postman/paypal-ai-collection.json`](./postman/paypal-ai-collection.json).
-- **Render**: Production blueprint in [`render.yaml`](./render.yaml) supporting 1-click deployment, paired with webpack memory optimization ([`next.config.mjs`](./next.config.mjs)) for 512 MB Free containers and a 12-minute [`/api/health` keep-alive workflow](./.github/workflows/render-keepalive.yml) to eliminate idle cold starts.
+- **Render**: Production blueprint in [`render.yaml`](./render.yaml) supporting 1-click deployment, paired with webpack memory optimization ([`next.config.mjs`](./next.config.mjs)) for 512 MB Free containers and a 12-minute [keep-alive workflow](./.github/workflows/render-keepalive.yml) pinging `/` cleanly without waking Neon DB.

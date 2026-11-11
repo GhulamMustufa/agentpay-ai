@@ -8,11 +8,11 @@ This guide contains everything required for judges to run, test, and verify **Ag
 
 You do **not** need to register an account or enter live credit cards to test the system:
 
-1. **Start the App**:
-   ```bash
-   npm run dev
-   ```
-2. Navigate to `http://localhost:3000`.
+1. **Open the Live Render Deployment** (no local setup needed):
+   - App: [https://agentpay-ai.onrender.com](https://agentpay-ai.onrender.com)
+   - Health Check: [https://agentpay-ai.onrender.com/api/health](https://agentpay-ai.onrender.com/api/health)
+   - Interactive Deck: [https://agentpay-ai.onrender.com/slides.html](https://agentpay-ai.onrender.com/slides.html)
+2. Or run locally with `npm run dev` and navigate to `http://localhost:3000`.
 3. Click **"Try the Live Demo (No Sign-Up Needed)"** (or **"Open Demo"**) on the homepage.
 4. The system opens with **1-Click Guest Access** and activates the **PayPal Developer Sandbox** demo mode.
 5. Click **"Find Best Deals Safely"** to see the full flow:
