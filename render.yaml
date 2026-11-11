@@ -3,8 +3,8 @@ services:
     name: agentpay-ai
     env: node
     plan: free
-    buildCommand: npm ci --no-audit --no-fund && npm run build
-    startCommand: npm run start
+    buildCommand: npm ci --include=dev --no-audit --no-fund && NODE_OPTIONS="--max-old-space-size=460" npm run build
+    startCommand: NODE_OPTIONS="--max-old-space-size=384" npm run start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV

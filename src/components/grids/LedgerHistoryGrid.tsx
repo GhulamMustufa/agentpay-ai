@@ -1,20 +1,18 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   AllCommunityModule,
   ColDef,
   ICellRendererParams,
   ModuleRegistry,
-  colorSchemeDark,
-  colorSchemeLight,
-  themeQuartz,
 } from "ag-grid-community";
 import { Download, ExternalLink } from "lucide-react";
 import { LedgerRecord } from "@/lib/storage/ledger";
 import { useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/Button";
+import { createAgentPayGridTheme } from "./gridTheme";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -25,18 +23,20 @@ interface LedgerHistoryGridProps {
 export function LedgerHistoryGrid({ records }: LedgerHistoryGridProps) {
   const { theme } = useTheme();
   const gridRef = useRef<AgGridReact<LedgerRecord>>(null);
+  const [popupParent, setPopupParent] = useState<HTMLElement | undefined>(undefined);
 
-  const gridTheme = useMemo(() => {
-    const scheme = theme === "dark" ? colorSchemeDark : colorSchemeLight;
-    return themeQuartz.withPart(scheme).withParams({
-      backgroundColor: "transparent",
-      headerBackgroundColor: theme === "dark" ? "rgba(255,255,255,0.03)" : "rgba(15,23,42,0.03)",
-      borderColor: theme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(15,23,42,0.1)",
-      fontFamily: "inherit",
-      fontSize: 11,
-      rowVerticalPaddingScale: 0.85,
-    });
-  }, [theme]);
+  useEffect(() => {
+    setPopupParent(document.body);
+  }, []);
+
+  const gridTheme = useMemo(
+    () =>
+      createAgentPayGridTheme(theme === "dark" ? "dark" : "light", {
+        fontSize: 11,
+        rowVerticalPaddingScale: 0.85,
+      }),
+    [theme]
+  );
 
   const colDefs = useMemo<ColDef<LedgerRecord>[]>(
     () => [
@@ -147,6 +147,7 @@ export function LedgerHistoryGrid({ records }: LedgerHistoryGridProps) {
           columnDefs={colDefs}
           defaultColDef={defaultColDef}
           domLayout="autoHeight"
+          popupParent={popupParent}
           suppressCellFocus={true}
           rowHeight={36}
           headerHeight={32}

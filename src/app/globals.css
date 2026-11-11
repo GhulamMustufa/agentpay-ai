@@ -78,3 +78,8 @@
   letter-spacing: -0.025em;
   line-height: 1.15;
 }
+
+/* Keep AG Grid popups cleanly layered above sticky headers (z-30) and below modals (z-50) */
+.ag-popup-child {
+  z-index: 40;
+}

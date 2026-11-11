@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   AllCommunityModule,
@@ -8,15 +8,13 @@ import {
   ICellRendererParams,
   ModuleRegistry,
   RowClassParams,
-  colorSchemeDark,
-  colorSchemeLight,
-  themeQuartz,
 } from "ag-grid-community";
 import { Check, Download, Search, XCircle } from "lucide-react";
 import { ShoppingQuote } from "@/lib/ai/shopping-agent";
 import { useTheme } from "@/components/ThemeProvider";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { createAgentPayGridTheme } from "./gridTheme";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -28,18 +26,20 @@ export function StoreComparisonGrid({ quotes }: StoreComparisonGridProps) {
   const { theme } = useTheme();
   const gridRef = useRef<AgGridReact<ShoppingQuote>>(null);
   const [quickFilter, setQuickFilter] = useState("");
+  const [popupParent, setPopupParent] = useState<HTMLElement | undefined>(undefined);
 
-  const gridTheme = useMemo(() => {
-    const scheme = theme === "dark" ? colorSchemeDark : colorSchemeLight;
-    return themeQuartz.withPart(scheme).withParams({
-      backgroundColor: "transparent",
-      headerBackgroundColor: theme === "dark" ? "rgba(255,255,255,0.03)" : "rgba(15,23,42,0.03)",
-      borderColor: theme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(15,23,42,0.1)",
-      fontFamily: "inherit",
-      fontSize: 12,
-      rowVerticalPaddingScale: 0.9,
-    });
-  }, [theme]);
+  useEffect(() => {
+    setPopupParent(document.body);
+  }, []);
+
+  const gridTheme = useMemo(
+    () =>
+      createAgentPayGridTheme(theme === "dark" ? "dark" : "light", {
+        fontSize: 12,
+        rowVerticalPaddingScale: 0.9,
+      }),
+    [theme]
+  );
 
   const colDefs = useMemo<ColDef<ShoppingQuote>[]>(
     () => [
@@ -196,6 +196,7 @@ export function StoreComparisonGrid({ quotes }: StoreComparisonGridProps) {
           defaultColDef={defaultColDef}
           quickFilterText={quickFilter}
           domLayout="autoHeight"
+          popupParent={popupParent}
           getRowStyle={getRowStyle}
           suppressCellFocus={true}
           rowHeight={42}

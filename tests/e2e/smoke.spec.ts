@@ -89,6 +89,32 @@ test.describe("AgentPay AI Principal QA End-to-End Suite", () => {
     await expect(page.getByText("Spending Limit", { exact: true })).toBeVisible();
     await expect(page.getByText("Powered by AG Grid")).toBeVisible();
 
+    // Verify AG Grid column filter popup and dropdown list are opaque (never transparent) and unclipped
+    const filterBtn = page.locator('.ag-header-cell[col-id="vendor"] .ag-header-cell-filter-button').first();
+    await expect(filterBtn).toBeVisible();
+    await filterBtn.click();
+
+    const filterMenu = page.locator(".ag-menu").first();
+    await expect(filterMenu).toBeVisible();
+    const menuBg = await filterMenu.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(menuBg).not.toBe("rgba(0, 0, 0, 0)");
+    expect(menuBg).not.toBe("transparent");
+    expect(menuBg.startsWith("rgb(")).toBe(true);
+
+    const pickerBtn = filterMenu.locator(".ag-picker-field-wrapper").first();
+    await expect(pickerBtn).toBeVisible();
+    await pickerBtn.click();
+
+    const selectList = page.locator(".ag-select-list").first();
+    await expect(selectList).toBeVisible();
+    const selectBg = await selectList.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(selectBg.startsWith("rgb(")).toBe(true);
+    const selectBox = await selectList.boundingBox();
+    expect(selectBox?.height ?? 0).toBeGreaterThan(80);
+
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
+
     expect(monitors.pageErrors).toEqual([]);
     expect(monitors.serverErrors).toEqual([]);
     expect(monitors.consoleErrors).toEqual([]);
